@@ -4,73 +4,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Information Management System
+    <title>Employee Information Management System</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
     <div id="app">
-        <button id="add-btn" class="add-btn" type="button">Add New Employee
+        <button id="addBtn" class="add-btn" type="button">Add New Employee</button>
 
-        <div id="employee-modal" class="modal" style="display: none">
-            <form id="employee-form">
-                <input type="text" id="employeeId" name="employeeId" placeholder="Employee ID" required
-                    pattern="^[A-Za-z0-9-]+$">
-                <input type="text" id="name" name="name" placeholder="Name" required>
-                <input type="date" id="dob" name="dob" required>
-                <input type="text" id="ssn" name="ssn" placeholder="SSN (e.g., 000-00-0000)" required
-                    pattern="^\d{3}-\d{2}-\d{4}$">
-                <select id="gender" name="gender" required>
-                    <option value="">Select gender 
-                    <option value="Male">Male 
-                    <option value="Female">Female 
-                    <option value="Other">Other 
+        <div id="employeeModal" class="modal" style="display: none">
+            <form id="employeeForm">
+                <input type="text" id="employeeId" name="employeeId" placeholder="Employee ID">
+                <input type="text" id="name" name="name" placeholder="Name">
+                <input type="date" id="dob" name="dob">
+                <input type="text" id="ssn" name="ssn" placeholder="SSN (e.g., 000-00-0000)">
+                <select id="gender" name="gender">
+                    <option value="">Select gender
+                    <option value="Male">Male
+                    <option value="Female">Female
+                    <option value="Other">Other
                 </select>
-                <textarea id="address" name="address" placeholder="Address" required></textarea>
-                <input type="tel" id="phone" name="phone" placeholder="Phone (10-digit)" required pattern="^\d{10}$">
-                <input type="email" id="email" name="email" placeholder="Email" required>
-                <select id="preferredCommunication" name="preferredCommunication" required>
-                    <option value="">Select preferredCommunication 
-                    <option value="Email">Email 
-                    <option value="Phone">Phone 
+                <textarea id="address" name="address" placeholder="Address"></textarea>
+                <input type="tel" id="phone" name="phone" placeholder="Phone (10-digit)">
+                <input type="email" id="email" name="email" placeholder="Email">
+                <select id="preferredCommunication" name="preferredCommunication">
+                    <option value="">Select preferred communication
+                    <option value="Email">Email
+                    <option value="Phone">Phone
                 </select>
-                <input type="text" id="jobTitle" name="jobTitle" placeholder="Job Title" required>
-                <select id="department" name="department" required>
-                    <option value="">Select department 
-                    <option value="Sales">Sales 
-                    <option value="Marketing">Marketing 
-                    <option value="Human Resources">Human Resources 
-                    <option value="Finance">Finance 
-                    <option value="Engineering">Engineering 
-                    <option value="Information Technology (IT)">Information Technology (IT) 
-                    <option value="Customer Support">Customer Support 
-                    <option value="Design">Design 
+                <input type="text" id="jobTitle" name="jobTitle" placeholder="Job Title">
+                <select id="department" name="department">
+                    <option value="">Select department
+                    <option value="Sales">Sales
+                    <option value="Marketing">Marketing
+                    <option value="Human Resources">Human Resources
+                    <option value="Finance">Finance
+                    <option value="Engineering">Engineering
+                    <option value="Information Technology (IT)">Information Technology (IT)
+                    <option value="Customer Support">Customer Support
+                    <option value="Design">Design
                 </select>
-                <input type="number" id="salary" name="salary" placeholder="Salary" required min="1">
-                <button type="submit">Save
-                <button type="button" id="cancel-btn">Cancel
+                <input type="number" id="salary" name="salary" placeholder="Salary">
+                <button type="submit">Save</button>
+                <button type="button" id="cancelBtn">Cancel</button>
             </form>
         </div>
 
-        <table id="employee-table">
+        <table id="employeeTable">
             <thead>
                 <tr>
                     <th>ID
-                    <th>Name 
-                    <th>DOB 
-                    <th>SSN 
-                    <th>Gender 
-                    <th>Address 
-                    <th>Phone 
-                    <th>Email 
-                    <th>Preferred Comms 
-                    <th>Job Title 
-                    <th>Department 
-                    <th>Salary 
-                    <th>Actions 
+                    <th>Name
+                    <th>DOB
+                    <th>SSN
+                    <th>Gender
+                    <th>Address
+                    <th>Phone
+                    <th>Email
+                    <th>Preferred Comms
+                    <th>Job Title
+                    <th>Department
+                    <th>Salary
+                    <th>Actions
+                </tr>
             </thead>
-            <tbody id="employee-tbody"></tbody>
+            <tbody id="employeeTbody"></tbody>
         </table>
     </div>
 

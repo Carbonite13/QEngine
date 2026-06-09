@@ -1,174 +1,192 @@
-function createEmployee(name, dob, ssn, gender, address, phone, email, com, id, title, dept, salary) {
-    return { name, dob, ssn, gender, address, phone, email, com, id, title, dept, salary };
+// State management
+let rowStore = [];
+let editingEmployeeId = null;
+
+// DOM Element References
+let addBtn, modal, form, tbody, submitBtn, cancelBtn;
+
+// Optimised Employee Factory Function using object spread
+function createEmployee(data) {
+    return { ...data };
 }
 
-class App {
-    constructor() {
-        this.addBtn = document.getElementById("add-btn");
-        this.modal = document.getElementById("employee-modal");
-        this.form = document.getElementById("employee-form");
-        this.tbody = document.getElementById("employee-tbody");
-        this.submitBtn = this.form.querySelector("button[type='submit']");
-        this.cancelBtn = document.getElementById("cancel-btn");
+// Client-side JS custom validation routines
+function validateField(field) {
+    let isValid = true;
+    let message = "";
+    const value = field.value.trim();
 
-        this.rowStore = [];
-        this.editingEmployeeId = null;
-
-        this.init();
+    if (!value) {
+        isValid = false;
+        message = "This field is required.";
+    } else {
+        if (field.id === "employeeId" && !/^[A-Za-z0-9-]+$/.test(value)) {
+            isValid = false;
+            message = "Employee ID must contain only alphanumeric characters or hyphens.";
+        } else if (field.id === "ssn" && !/^\d{3}-\d{2}-\d{4}$/.test(value)) {
+            isValid = false;
+            message = "SSN must follow the 000-00-0000 format.";
+        } else if (field.id === "phone" && !/^\d{10}$/.test(value)) {
+            isValid = false;
+            message = "Phone number must be exactly 10 digits.";
+        } else if (field.id === "salary" && (isNaN(value) || Number(value) < 1)) {
+            isValid = false;
+            message = "Salary must be a positive number greater than 0.";
+        } else if (field.id === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            isValid = false;
+            message = "Please enter a valid email address.";
+        }
     }
 
-    init() {
-        this.addBtn.addEventListener("click", () => {
-            this.editingEmployeeId = null;
-            this.submitBtn.textContent = "Save";
-            this.showForm();
-        });
+    field.setCustomValidity(message);
+    return isValid;
+}
 
-        this.cancelBtn.addEventListener("click", () => this.hideForm());
+function showForm() {
+    modal.style.display = "flex";
+}
 
-        this.form.addEventListener("submit", (e) => {
-            e.preventDefault();
-            this.handleFormSubmit();
-        });
+function hideForm() {
+    modal.style.display = "none";
+    form.reset();
+
+    // Clear validation diagnostics upon close
+    form.querySelectorAll("input, select, textarea").forEach(field => {
+        field.setCustomValidity("");
+    });
+}
+
+function populateForm(data) {
+    Object.entries(data).forEach(([key, value]) => {
+        const field = form.elements[key];
+        if (field) field.value = value;
+    });
+}
+
+function getFormData() {
+    return Object.fromEntries(new FormData(form));
+}
+
+function handleFormSubmit() {
+    const fields = form.querySelectorAll("input, select, textarea");
+    let isFormValid = true;
+
+    // Direct explicit evaluation of form fields
+    fields.forEach(field => {
+        if (!validateField(field)) {
+            isFormValid = false;
+        }
+    });
+
+    if (!isFormValid) {
+        form.reportValidity();
+        return;
     }
 
-    showForm() {
-        this.modal.style.display = "flex";
-    }
+    const formData = getFormData();
 
-    hideForm() {
-        this.modal.style.display = "none";
-        this.form.reset();
-    }
-
-    populateForm(data) {
-        Object.entries(data).forEach(([key, value]) => {
-            const field = this.form.elements[key];
-            if (field) field.value = value;
-        });
-    }
-
-    getFormData() {
-        return Object.fromEntries(new FormData(this.form));
-    }
-
-    handleFormSubmit() {
-        const formData = this.getFormData();
-
-        if (this.editingEmployeeId !== null) {
-            const targetEmployee = this.rowStore.find(emp => emp.id === this.editingEmployeeId);
-            if (targetEmployee) {
-                Object.assign(targetEmployee, {
-                    id: formData.employeeId,
-                    name: formData.name,
-                    dob: formData.dob,
-                    ssn: formData.ssn,
-                    gender: formData.gender,
-                    address: formData.address,
-                    phone: formData.phone,
-                    email: formData.email,
-                    com: formData.preferredCommunication,
-                    title: formData.jobTitle,
-                    dept: formData.department,
-                    salary: formData.salary
-                });
-            }
-            this.editingEmployeeId = null;
-        } else {
-            const duplicateCheck = this.rowStore.some(emp => emp.id === formData.employeeId);
-            if (duplicateCheck) {
-                alert("An employee with this ID already exists!");
-                return;
-            }
-
-            const newEmployee = createEmployee(
-                formData.name,
-                formData.dob,
-                formData.ssn,
-                formData.gender,
-                formData.address,
-                formData.phone,
-                formData.email,
-                formData.preferredCommunication,
-                formData.employeeId,
-                formData.jobTitle,
-                formData.department,
-                formData.salary
-            );
-            this.rowStore.push(newEmployee);
+    if (editingEmployeeId !== null) {
+        const targetEmployee = rowStore.find(emp => emp.employeeId === editingEmployeeId);
+        if (targetEmployee) {
+            // Merges data cleanly because property keys now match form keys exactly
+            Object.assign(targetEmployee, formData);
+        }
+        editingEmployeeId = null;
+    } else {
+        const duplicateCheck = rowStore.some(emp => emp.employeeId === formData.employeeId);
+        if (duplicateCheck) {
+            alert("An employee with this ID already exists!");
+            return;
         }
 
-        this.hideForm();
-        this.renderTableRows();
+        const newEmployee = createEmployee(formData);
+        rowStore.push(newEmployee);
     }
 
-    renderTableRows() {
-        this.tbody.innerHTML = "";
+    hideForm();
+    renderTableRows();
+}
 
-        this.rowStore.forEach(employee => {
-            const tr = document.createElement("tr");
+function renderTableRows() {
+    tbody.innerHTML = "";
 
-            const values = [
-                employee.id, employee.name, employee.dob, employee.ssn,
-                employee.gender, employee.address, employee.phone,
-                employee.email, employee.com, employee.title, employee.dept, employee.salary
-            ];
+    rowStore.forEach(employee => {
+        const tr = document.createElement("tr");
 
-            values.forEach(val => {
-                const td = document.createElement("td");
-                td.textContent = val;
-                tr.appendChild(td);
-            });
+        const values = [
+            employee.employeeId, employee.name, employee.dob, employee.ssn,
+            employee.gender, employee.address, employee.phone,
+            employee.email, employee.preferredCommunication, employee.jobTitle,
+            employee.department, employee.salary
+        ];
 
-            const actionsTd = document.createElement("td");
-
-            const editBtn = document.createElement("button");
-            editBtn.textContent = "Edit";
-            editBtn.className = "edit-action-btn";
-            editBtn.addEventListener("click", () => this.handleEditAction(employee));
-
-            const deleteBtn = document.createElement("button");
-            deleteBtn.textContent = "Delete";
-            deleteBtn.className = "delete-action-btn";
-            deleteBtn.addEventListener("click", () => this.handleDeleteAction(employee.id));
-
-            actionsTd.append(editBtn, deleteBtn);
-            tr.appendChild(actionsTd);
-
-            this.tbody.appendChild(tr);
-        });
-    }
-
-    handleEditAction(employee) {
-        this.editingEmployeeId = employee.id;
-        this.submitBtn.textContent = "Update";
-
-        this.populateForm({
-            employeeId: employee.id,
-            name: employee.name,
-            dob: employee.dob,
-            ssn: employee.ssn,
-            gender: employee.gender,
-            address: employee.address,
-            phone: employee.phone,
-            email: employee.email,
-            preferredCommunication: employee.com,
-            jobTitle: employee.title,
-            department: employee.dept,
-            salary: employee.salary
+        values.forEach(val => {
+            const td = document.createElement("td");
+            td.textContent = val;
+            tr.appendChild(td);
         });
 
-        this.showForm();
-    }
+        const actionsTd = document.createElement("td");
 
-    handleDeleteAction(id) {
-        if (confirm(`Are you sure you want to completely remove Empyee ID: ${id}?`)) {
-            this.rowStore = this.rowStore.filter(emp => emp.id !== id);
-            this.renderTableRows();
-        }
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Edit";
+        editBtn.className = "edit-action-btn";
+        editBtn.addEventListener("click", () => handleEditAction(employee));
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.className = "delete-action-btn";
+        deleteBtn.addEventListener("click", () => handleDeleteAction(employee.employeeId));
+
+        actionsTd.append(editBtn, deleteBtn);
+        tr.appendChild(actionsTd);
+
+        tbody.appendChild(tr);
+    });
+}
+
+function handleEditAction(employee) {
+    editingEmployeeId = employee.employeeId;
+    submitBtn.textContent = "Update";
+
+    // Because the fields perfectly match the internal data structure, we pass it right in
+    populateForm(employee);
+    showForm();
+}
+
+function handleDeleteAction(id) {
+    if (confirm(`Are you sure you want to completely remove Employee ID: ${id}?`)) {
+        rowStore = rowStore.filter(emp => emp.employeeId !== id);
+        renderTableRows();
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    new App();
-});
+function init() {
+    addBtn = document.getElementById("addBtn");
+    modal = document.getElementById("employeeModal");
+    form = document.getElementById("employeeForm");
+    tbody = document.getElementById("employeeTbody");
+    submitBtn = form.querySelector("button[type='submit']");
+    cancelBtn = document.getElementById("cancelBtn");
+
+    addBtn.addEventListener("click", () => {
+        editingEmployeeId = null;
+        submitBtn.textContent = "Save";
+        showForm();
+    });
+
+    cancelBtn.addEventListener("click", hideForm);
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        handleFormSubmit();
+    });
+
+    // Handle real-time inline evaluation using JS inputs
+    const inputs = form.querySelectorAll("input, select, textarea");
+    inputs.forEach(input => {
+        input.addEventListener("input", () => validateField(input));
+    });
+}
+
+document.addEventListener("DOMContentLoaded", init);
