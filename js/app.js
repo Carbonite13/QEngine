@@ -3,18 +3,25 @@ let rowStore = [];
 let editingEmployeeId = null;
 
 // DOM Element References
-let addBtn, modal, form, tbody, submitBtn, cancelBtn;
+let addBtn, modal, form, tbody, submitBtn, cancelBtn, closeHeaderBtn;
 
 // Optimised Employee Factory Function using object spread
 function createEmployee(data) {
     return { ...data };
 }
 
-// Client-side JS custom validation routines
-function validateField(field) {
+/**
+ * Validates a single input and dynamically coordinates Bootstrap validation state classes.
+ * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} field 
+ * @returns {boolean} Whether the field passes validation structural constraints
+ */
+function validateError(field) {
     let isValid = true;
     let message = "";
+
     const value = field.value.trim();
+    const errorFieldID = field.id.concat("Error");
+    const errorField = document.getElementById(errorFieldID);
 
     if (!value) {
         isValid = false;
@@ -38,21 +45,39 @@ function validateField(field) {
         }
     }
 
-    field.setCustomValidity(message);
+    // Toggle Bootstrap validation classes along with custom error copy
+    if (isValid) {
+        field.classList.remove("is-invalid");
+        field.classList.add("is-invalid-not", "is-valid"); // Optional aesthetic enhancement
+        if (errorField) errorField.innerText = "";
+    } else {
+        field.classList.remove("is-valid");
+        field.classList.add("is-invalid");
+        if (errorField) errorField.innerText = message;
+    }
+
     return isValid;
 }
 
 function showForm() {
-    modal.style.display = "flex";
+    // Graceful interaction routing natively via programmatic configuration
+    modal.classList.add("show");
+    modal.style.display = "block";
+    document.body.classList.add("modal-open");
 }
 
 function hideForm() {
+    modal.classList.remove("show");
     modal.style.display = "none";
+    document.body.classList.remove("modal-open");
     form.reset();
 
-    // Clear validation diagnostics upon close
+    // Wipe contextual Bootstrap error indicators when wiping state elements
     form.querySelectorAll("input, select, textarea").forEach(field => {
-        field.setCustomValidity("");
+        field.classList.remove("is-invalid", "is-valid");
+    });
+    form.querySelectorAll("span[id$='Error'], div[id$='Error']").forEach(div => {
+        div.innerText = "";
     });
 }
 
@@ -71,15 +96,13 @@ function handleFormSubmit() {
     const fields = form.querySelectorAll("input, select, textarea");
     let isFormValid = true;
 
-    // Direct explicit evaluation of form fields
     fields.forEach(field => {
-        if (!validateField(field)) {
+        if (!validateError(field)) {
             isFormValid = false;
         }
     });
 
     if (!isFormValid) {
-        form.reportValidity();
         return;
     }
 
@@ -88,14 +111,16 @@ function handleFormSubmit() {
     if (editingEmployeeId !== null) {
         const targetEmployee = rowStore.find(emp => emp.employeeId === editingEmployeeId);
         if (targetEmployee) {
-            // Merges data cleanly because property keys now match form keys exactly
             Object.assign(targetEmployee, formData);
         }
         editingEmployeeId = null;
     } else {
         const duplicateCheck = rowStore.some(emp => emp.employeeId === formData.employeeId);
         if (duplicateCheck) {
-            alert("An employee with this ID already exists!");
+            const idInput = document.getElementById("employeeId");
+            const idError = document.getElementById("employeeIdError");
+            if (idInput) idInput.classList.add("is-invalid");
+            if (idError) idError.innerText = "An employee with this ID already exists!";
             return;
         }
 
@@ -120,22 +145,25 @@ function renderTableRows() {
             employee.department, employee.salary
         ];
 
-        values.forEach(val => {
+        // Add padding helper to the first metric block matching table header layout
+        values.forEach((val, index) => {
             const td = document.createElement("td");
             td.textContent = val;
+            if (index === 0) td.classList.add("ps-3");
             tr.appendChild(td);
         });
 
         const actionsTd = document.createElement("td");
+        actionsTd.className = "pe-3 text-end text-nowrap";
 
         const editBtn = document.createElement("button");
         editBtn.textContent = "Edit";
-        editBtn.className = "edit-action-btn";
+        editBtn.className = "btn btn-sm btn-warning me-1";
         editBtn.addEventListener("click", () => handleEditAction(employee));
 
         const deleteBtn = document.createElement("button");
         deleteBtn.textContent = "Delete";
-        deleteBtn.className = "delete-action-btn";
+        deleteBtn.className = "btn btn-sm btn-danger";
         deleteBtn.addEventListener("click", () => handleDeleteAction(employee.employeeId));
 
         actionsTd.append(editBtn, deleteBtn);
@@ -147,9 +175,9 @@ function renderTableRows() {
 
 function handleEditAction(employee) {
     editingEmployeeId = employee.employeeId;
-    submitBtn.textContent = "Update";
+    submitBtn.textContent = "Update Record";
+    document.getElementById("modalTitle").textContent = "Update Employee Records";
 
-    // Because the fields perfectly match the internal data structure, we pass it right in
     populateForm(employee);
     showForm();
 }
@@ -166,26 +194,28 @@ function init() {
     modal = document.getElementById("employeeModal");
     form = document.getElementById("employeeForm");
     tbody = document.getElementById("employeeTbody");
-    submitBtn = form.querySelector("button[type='submit']");
+    submitBtn = document.getElementById("submitBtn");
     cancelBtn = document.getElementById("cancelBtn");
+    closeHeaderBtn = document.getElementById("closeHeaderBtn");
 
     addBtn.addEventListener("click", () => {
         editingEmployeeId = null;
-        submitBtn.textContent = "Save";
+        submitBtn.textContent = "Save Record";
+        document.getElementById("modalTitle").textContent = "Add New Employee";
         showForm();
     });
 
     cancelBtn.addEventListener("click", hideForm);
+    closeHeaderBtn.addEventListener("click", hideForm);
 
     form.addEventListener("submit", (e) => {
         e.preventDefault();
         handleFormSubmit();
     });
 
-    // Handle real-time inline evaluation using JS inputs
     const inputs = form.querySelectorAll("input, select, textarea");
     inputs.forEach(input => {
-        input.addEventListener("input", () => validateField(input));
+        input.addEventListener("input", () => validateError(input));
     });
 }
 
