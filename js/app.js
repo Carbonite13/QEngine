@@ -1,47 +1,5 @@
-class Employee {
-    constructor(name, dob, ssn, gender, address, phone, email, com, id, title, dept, salary) {
-        this.name = name;
-        this.dob = dob;
-        this.ssn = ssn;
-        this.gender = gender;
-        this.address = address;
-        this.phone = phone;
-        this.email = email;
-        this.com = com;
-        this.title = title;
-        this.id = id;
-        this.dept = dept;
-        this.salary = salary;
-    }
-
-    display() {
-        console.info(this.data());
-    }
-
-    data() {
-        return {
-            name: this.name,
-            dob: this.dob,
-            ssn: this.ssn,
-            gender: this.gender,
-            address: this.address,
-            phone: this.phone,
-            email: this.email,
-            com: this.com,
-            id: this.id,
-            title: this.title,
-            dept: this.dept,
-            salary: this.salary,
-        };
-    }
-
-    update(data) {
-        Object.assign(this, data);
-    }
-
-    getId() {
-        return this.id;
-    }
+function createEmployee(name, dob, ssn, gender, address, phone, email, com, id, title, dept, salary) {
+    return { name, dob, ssn, gender, address, phone, email, com, id, title, dept, salary };
 }
 
 class App {
@@ -98,9 +56,9 @@ class App {
         const formData = this.getFormData();
 
         if (this.editingEmployeeId !== null) {
-            const targetEmployee = this.rowStore.find(emp => emp.getId() === this.editingEmployeeId);
+            const targetEmployee = this.rowStore.find(emp => emp.id === this.editingEmployeeId);
             if (targetEmployee) {
-                targetEmployee.update({
+                Object.assign(targetEmployee, {
                     id: formData.employeeId,
                     name: formData.name,
                     dob: formData.dob,
@@ -117,13 +75,13 @@ class App {
             }
             this.editingEmployeeId = null;
         } else {
-            const duplicateCheck = this.rowStore.some(emp => emp.getId() === formData.employeeId);
+            const duplicateCheck = this.rowStore.some(emp => emp.id === formData.employeeId);
             if (duplicateCheck) {
                 alert("An employee with this ID already exists!");
                 return;
             }
 
-            const newEmployee = new Employee(
+            const newEmployee = createEmployee(
                 formData.name,
                 formData.dob,
                 formData.ssn,
@@ -148,13 +106,12 @@ class App {
         this.tbody.innerHTML = "";
 
         this.rowStore.forEach(employee => {
-            const rowData = employee.data();
             const tr = document.createElement("tr");
 
             const values = [
-                rowData.id, rowData.name, rowData.dob, rowData.ssn,
-                rowData.gender, rowData.address, rowData.phone,
-                rowData.email, rowData.com, rowData.title, rowData.dept, rowData.salary
+                employee.id, employee.name, employee.dob, employee.ssn,
+                employee.gender, employee.address, employee.phone,
+                employee.email, employee.com, employee.title, employee.dept, employee.salary
             ];
 
             values.forEach(val => {
@@ -173,7 +130,7 @@ class App {
             const deleteBtn = document.createElement("button");
             deleteBtn.textContent = "Delete";
             deleteBtn.className = "delete-action-btn";
-            deleteBtn.addEventListener("click", () => this.handleDeleteAction(employee.getId()));
+            deleteBtn.addEventListener("click", () => this.handleDeleteAction(employee.id));
 
             actionsTd.append(editBtn, deleteBtn);
             tr.appendChild(actionsTd);
@@ -183,7 +140,7 @@ class App {
     }
 
     handleEditAction(employee) {
-        this.editingEmployeeId = employee.getId();
+        this.editingEmployeeId = employee.id;
         this.submitBtn.textContent = "Update";
 
         this.populateForm({
@@ -206,7 +163,7 @@ class App {
 
     handleDeleteAction(id) {
         if (confirm(`Are you sure you want to completely remove Empyee ID: ${id}?`)) {
-            this.rowStore = this.rowStore.filter(emp => emp.getId() !== id);
+            this.rowStore = this.rowStore.filter(emp => emp.id !== id);
             this.renderTableRows();
         }
     }
