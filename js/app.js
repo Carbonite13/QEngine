@@ -1,16 +1,18 @@
 let rowStore = [];
 let editingEmployeeId = null;
 
-let $modal, $form, $tbody, $submitBtn;
+// Auto-increment Sequence Configuration
+const idSlug = 'EMP';
+let idNumber = 0;
 
-function createEmployee(data) {
-    return { ...data };
+function getId(n) {
+    return `${idSlug}-${String(n).padStart(3, '0')}`;
 }
+
+let $modal, $form, $tbody, $submitBtn;
 
 /**
  * Validates a single input and dynamically coordinates Bootstrap validation state classes.
- * @param {jQuery} $field - The jQuery object of the input field
- * @returns {boolean}
  */
 function validateError($field) {
     let isValid = true;
@@ -20,13 +22,17 @@ function validateError($field) {
     const id = $field.attr("id");
     const $errorField = $(`#${id}Error`);
 
+    // Skip validation for employeeId since it's now auto-generated and read-only
+    if (id === "employeeId") {
+        $field.removeClass("is-invalid").addClass("is-valid");
+        return true;
+    }
+
     if (!value) {
         isValid = false;
         message = "This field is required.";
     } else {
-        if (id === "employeeId" && !/^[A-Za-z0-9-]+$/.test(value)) {
-            isValid = false; message = "Employee ID must contain only alphanumeric characters or hyphens.";
-        } else if (id === "ssn" && !/^\d{3}-\d{2}-\d{4}$/.test(value)) {
+        if (id === "ssn" && !/^\d{3}-\d{2}-\d{4}$/.test(value)) {
             isValid = false; message = "SSN must follow the 000-00-0000 format.";
         } else if (id === "phone" && !/^\d{10}$/.test(value)) {
             isValid = false; message = "Phone number must be exactly 10 digits.";
@@ -58,6 +64,7 @@ function hideForm() {
     $("body").removeClass("modal-open");
     $form[0].reset();
 
+    // Wipe Bootstrap validation states
     $form.find("input, select, textarea").removeClass("is-invalid is-valid");
     $form.find(".invalid-feedback").text("");
 }
@@ -80,23 +87,22 @@ function handleFormSubmit() {
 
     if (!isFormValid) return;
 
+    // Extract form data (Read-only values are safely captured here)
     const formData = Object.fromEntries(new FormData($form[0]));
 
     if (editingEmployeeId !== null) {
+        // Mode: Update Existing Record
         const targetEmployee = rowStore.find(emp => emp.employeeId === editingEmployeeId);
         if (targetEmployee) {
             Object.assign(targetEmployee, formData);
         }
         editingEmployeeId = null;
     } else {
-        const duplicateCheck = rowStore.some(emp => emp.employeeId === formData.employeeId);
-        if (duplicateCheck) {
-            $("#employeeId").addClass("is-invalid");
-            $("#employeeIdError").text("An employee with this ID already exists!");
-            return;
-        }
+        // Mode: New Record Insertion Success
+        rowStore.push({ ...formData });
 
-        rowStore.push(createEmployee(formData));
+        // Advance sequence by one since the insertion was successful
+        idNumber++;
     }
 
     hideForm();
@@ -104,7 +110,7 @@ function handleFormSubmit() {
 }
 
 function renderTableRows() {
-    $tbody.empty(); // innerHTML = "" 
+    $tbody.empty();
 
     $.each(rowStore, function (index, employee) {
         const $tr = $("<tr>");
@@ -116,14 +122,12 @@ function renderTableRows() {
             employee.department, employee.salary
         ];
 
-        // Map values into <td> elements
         $.each(values, function (i, val) {
             const $td = $("<td>").text(val);
-            if (i === 0) $td.addClass("ps-3"); // space
+            if (i === 0) $td.addClass("ps-3");
             $tr.append($td);
         });
 
-        // Action Buttons using jQuery chaining
         const $actionsTd = $("<td>").addClass("pe-3 text-end text-nowrap");
 
         const $editBtn = $("<button>")
@@ -147,6 +151,8 @@ function handleEditAction(employee) {
     $("#modalTitle").text("Update Employee Records");
 
     populateForm(employee);
+    // Keep the Employee ID field disabled/readonly during editing updates
+    $("#employeeId").prop("readonly", true);
     showForm();
 }
 
@@ -157,7 +163,6 @@ function handleDeleteAction(id) {
     }
 }
 
-// app start
 $(document).ready(function () {
     $modal = $("#employeeModal");
     $form = $("#employeeForm");
@@ -168,9 +173,17 @@ $(document).ready(function () {
         editingEmployeeId = null;
         $submitBtn.text("Save Record");
         $("#modalTitle").text("Add New Employee");
+
+        // 1. Calculate and populate the next sequential ID automatically
+        // 2. Apply readonly protection state
+        $("#employeeId")
+            .val(getId(idNumber + 1))
+            .prop("readonly", true);
+
         showForm();
     });
 
+    // If cancelled, hideForm executes form.reset() leaving the global idNumber completely unchanged
     $("#cancelBtn, #closeHeaderBtn").on("click", hideForm);
 
     $form.on("submit", function (e) {
@@ -178,7 +191,6 @@ $(document).ready(function () {
         handleFormSubmit();
     });
 
-    // listen on all input fields
     $form.on("input", "input, select, textarea", function () {
         validateError($(this));
     });
