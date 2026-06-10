@@ -1,11 +1,8 @@
-// State management
 let rowStore = [];
 let editingEmployeeId = null;
 
-// jQuery DOM Caching (Prefixing variables with $ is a common jQuery convention)
 let $modal, $form, $tbody, $submitBtn;
 
-// Optimised Employee Factory Function using object spread
 function createEmployee(data) {
     return { ...data };
 }
@@ -59,9 +56,8 @@ function showForm() {
 function hideForm() {
     $modal.removeClass("show").css("display", "none");
     $("body").removeClass("modal-open");
-    $form[0].reset(); // Access raw DOM element to trigger native reset
+    $form[0].reset();
 
-    // Wipe Bootstrap validation states
     $form.find("input, select, textarea").removeClass("is-invalid is-valid");
     $form.find(".invalid-feedback").text("");
 }
@@ -84,7 +80,6 @@ function handleFormSubmit() {
 
     if (!isFormValid) return;
 
-    // Extract form data into a clean object using modern JS combined with jQuery
     const formData = Object.fromEntries(new FormData($form[0]));
 
     if (editingEmployeeId !== null) {
@@ -109,7 +104,7 @@ function handleFormSubmit() {
 }
 
 function renderTableRows() {
-    $tbody.empty(); // jQuery shorthand to wipe inner HTML
+    $tbody.empty(); // innerHTML = "" 
 
     $.each(rowStore, function (index, employee) {
         const $tr = $("<tr>");
@@ -124,7 +119,7 @@ function renderTableRows() {
         // Map values into <td> elements
         $.each(values, function (i, val) {
             const $td = $("<td>").text(val);
-            if (i === 0) $td.addClass("ps-3"); // Bootstrap padding for first column
+            if (i === 0) $td.addClass("ps-3"); // space
             $tr.append($td);
         });
 
@@ -162,7 +157,7 @@ function handleDeleteAction(id) {
     }
 }
 
-// Initializer using jQuery document ready
+// app start
 $(document).ready(function () {
     $modal = $("#employeeModal");
     $form = $("#employeeForm");
@@ -183,7 +178,7 @@ $(document).ready(function () {
         handleFormSubmit();
     });
 
-    // Event delegation: Listen for input on any field inside the form
+    // listen on all input fields
     $form.on("input", "input, select, textarea", function () {
         validateError($(this));
     });
