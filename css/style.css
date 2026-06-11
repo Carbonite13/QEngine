@@ -54,7 +54,8 @@ form {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    /* gap: 1rem 0; */
+    margin-bottom: 10px;
     max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
@@ -70,6 +71,7 @@ form textarea {
     border-radius: 6px;
     font-family: inherit;
     font-size: 0.9rem;
+    margin-bottom: 0;
     outline: none;
     padding: 0.6rem 0.8rem;
     transition: border-color 0.2s ease;
@@ -83,6 +85,11 @@ form textarea:focus {
     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 
+form select,
+form textarea {
+    margin-bottom: 10px;
+}
+
 form textarea {
     grid-column: span 2;
     min-height: 60px;
@@ -94,6 +101,11 @@ form button {
     margin-top: 0.5rem;
 }
 
+form span {
+    color: red;
+    font-size: 10px;
+    height: 15px;
+}
 
 table {
     background-color: #ffffff;
