@@ -1,5 +1,6 @@
-# QEngine
-A minimalist, high-performance single-page application (SPA) designed to handle the complete CRUD (Create, Read, Update, Delete) lifecycle of organizational workforce records.
+# QEngine - Employee Information Management System
+
+A high-performance Employee Information Management System (EIMS) built with a modern full-stack architecture.
 
 ## 1. Functionality Documentation
 The EIMS is designed to streamline the management of personnel records within an organization.
@@ -7,41 +8,44 @@ The EIMS is designed to streamline the management of personnel records within an
 ### Core Features
 * **Centralized Record Management**: Users can add, view, update, and delete employee records from a unified interface.
 * **Modal Data Entry**: An interactive modal form handles all inputs, ensuring a clean workspace.
-* **Data Persistence (Session-based)**: Records are maintained in the application state and displayed in a structured data grid.
-* **Form Validation**: Enforces data integrity by requiring inputs for all fields and applying patterns to specific data (e.g., SSN, Phone, Salary).
+* **Data Persistence**: Records are stored in a MySQL database via a Sequelize ORM.
+* **Form Validation**: Enforces data integrity on both client (jQuery/Bootstrap) and server (Sequelize) levels.
 
 ### User Workflow
-1.  **Creation**: Click "Add New Employee" to open the input modal, fill in required fields, and save the record.
-2.  **Display**: Records appear instantly in the data table below the control button.
-3.  **Modification**: Click "Edit" on any row to open the modal populated with existing data. Submit updates to reflect changes in the table.
-4.  **Deletion**: Click "Delete" to remove a record from the organizational list after confirmation.
+1.  **Creation**: Click "Add New Employee". The system automatically generates a unique Employee ID (EIMS-timestamp).
+2.  **Display**: Records are fetched from the `/api/employees` endpoint and rendered dynamically.
+3.  **Modification**: Click "Edit" to update employee details.
+4.  **Deletion**: Click "Delete" to permanently remove a record after confirmation.
 
 ---
 
-## 2. Implementational Documentation
-The system uses a lightweight HTML-first layout with a minimal JavaScript controller for behavior and dynamic table rendering.
+## 2. Technical Documentation
 
 ### Architecture Overview
-The application is split across three files with clear responsibilities:
+The application follows a standard client-server model:
 
-* **`index.html`**: Declares the static UI — the add button, employee modal form (all fields, validation attributes, and action buttons), and the table header skeleton.
-* **`css/style.css`**: Styles the layout, modal overlay, form grid, table, and action buttons.
-* **`js/app.js`**: Contains a `createEmployee` factory for plain employee objects, and an `App` controller that wires events, manages state, and renders dynamic table rows.
+* **Backend**: Node.js with Express.js.
+* **ORM**: Sequelize for database interactions.
+* **Database**: MySQL.
+* **Frontend**: jQuery for AJAX/DOM and Bootstrap 5 for UI/UX.
 
 ### Implementation Details
-* **Data Model**: `createEmployee()` returns a plain object with employee attributes. Updates use `Object.assign()` on the stored reference.
-* **State Management**: The `App` controller maintains a `rowStore` array of employee objects and tracks `editingEmployeeId` for add vs. edit context.
-* **Event Handling**: A centralized `handleFormSubmit` method determines whether to create a new employee or update an existing one based on `editingEmployeeId`.
-* **DOM Structure**:
-    * **Static markup**: Form fields, selects, table headers, and the modal shell live in `index.html` and are referenced by ID in JavaScript.
-    * **Dynamic markup**: Table body rows and per-row Edit/Delete buttons are generated in `renderTableRows()` as data changes.
-    * **Modal Logic**: The `App` controller toggles `display: flex` / `none` on the modal element and resets the form on close.
-
-### Configuration & Patterns
-* **Validation**: Field requirements (`required`, `pattern`, `min`) are declared directly on HTML form elements, allowing the browser to handle client-side validation natively.
-* **Style Coupling**: CSS targets semantic selectors (`.modal`, `form`, `.add-btn`, `table`) that match the static HTML structure, using CSS Grid for the form layout and Flexbox for the application container.
+* **API Endpoints**:
+    * `GET /api/employees`: Fetch all records.
+    * `POST /api/employees`: Create a new record. Server generates `employeeId` if missing.
+    * `PUT /api/employees/:id`: Update a record by `employeeId`.
+    * `DELETE /api/employees/:id`: Delete a record by `employeeId`.
+* **Error Handling**: All API routes return JSON responses, including 404 and 500 errors.
+* **Configuration**: Environment variables (`.env`) manage database credentials and server port.
 
 ### Technical Stack
-* **Language**: Vanilla JavaScript (ES6+), HTML5, CSS3.
-* **Methodology**: HTML-first markup with a minimal JavaScript controller; plain objects for data.
-* **State Handling**: Memory-resident data storage.
+* **Runtime**: Node.js
+* **Backend**: Express, Sequelize, MySQL2
+* **Frontend**: jQuery 3.7.1, Bootstrap 5.3.3
+* **Environment**: Dotenv for configuration
+
+## 3. Setup Instructions
+1.  Install dependencies: `npm install`
+2.  Configure `.env` file with your MySQL credentials.
+3.  Start the server: `node server/app.js`
+4.  Access the UI at `http://localhost:3000`
