@@ -1,224 +1,41 @@
-/* root */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+/* Custom styles to complement Bootstrap 4 */
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f8f9fa;
-    color: #212529;
-    padding: 2rem;
-    line-height: 1.5;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
-/* button and stuff */
-button {
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 600;
-    padding: 0.6rem 1.2rem;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-button:active {
-    transform: scale(0.98);
-}
-
-/* Form Action Configurations */
-form button[type="submit"] {
-    background-color: #198754;
-    color: white;
-}
-
-form button[type="submit"]:hover {
-    background-color: #157347;
-}
-
-form button[type="button"] {
-    background-color: #6c757d;
-    color: white;
-}
-
-form button[type="button"]:hover {
-    background-color: #5c636a;
-}
-
-form {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    /* gap: 1rem 0; */
-    margin-bottom: 10px;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 2rem;
-    width: 100%;
-}
-
-form input,
-form select,
-form textarea {
-    background-color: #fff;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 0.9rem;
-    margin-bottom: 0;
-    outline: none;
-    padding: 0.6rem 0.8rem;
-    transition: border-color 0.2s ease;
-    width: 100%;
-}
-
-form input:focus,
-form select:focus,
-form textarea:focus {
-    border-color: #86b7fe;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
-
-form select,
-form textarea {
-    margin-bottom: 10px;
-}
-
-form textarea {
-    grid-column: span 2;
-    min-height: 60px;
-    resize: vertical;
-}
-
-form button {
-    grid-column: span 1;
-    margin-top: 0.5rem;
-}
-
-form span {
-    color: red;
-    font-size: 10px;
-    height: 15px;
-}
-
-table {
-    background-color: #ffffff;
-    border-collapse: collapse;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-    width: 100%;
-}
-
-th,
-td {
-    border-bottom: 1px solid #dee2e6;
-    font-size: 0.85rem;
-    padding: 1rem;
-    text-align: left;
-}
-
-th {
-    background-color: #f1f3f5;
-    color: #495057;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-
-tbody tr:last-child td {
-    border-bottom: none;
-}
-
-tbody tr:hover {
-    background-color: #f8f9fa;
-}
-
-td:last-child {
-    white-space: nowrap;
-    width: 1%;
-}
-
-
-/* ID SELECTORS */
-/* main-app */
 #app {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    margin: 0 auto;
     max-width: 1200px;
+    margin: 0 auto;
 }
 
-/* Classes */
-.add-btn {
-    align-self: flex-start;
-    background-color: #0d6efd;
-    color: #ffffff;
+/* DataTables Styling Tweaks */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0.2em 0.5em;
 }
 
-.add-btn:hover {
-    background-color: #0b5ed7;
+/* Form Validation Styles */
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 80%;
+    color: #dc3545;
 }
 
-.edit-action-btn {
-    background-color: #ffc107;
-    color: #000000;
-    font-size: 0.8rem;
-    margin-right: 0.5rem;
-    padding: 0.4rem 0.8rem;
+.is-invalid ~ .invalid-feedback {
+    display: block;
 }
 
-.edit-action-btn:hover {
-    background-color: #ffca2c;
+/* Modal layout adjustments */
+.modal-lg {
+    max-width: 800px;
 }
 
-.delete-action-btn {
-    background-color: #dc3545;
-    font-size: 0.8rem;
-    color: white;
-    padding: 0.4rem 0.8rem;
-}
-
-.delete-action-btn:hover {
-    background-color: #bb2d3b;
-}
-
-.modal {
-    align-items: center;
-    backdrop-filter: blur(4px);
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    height: 100vh;
-    justify-content: center;
-    left: 0;
-    position: fixed;
-    top: 0;
-    width: 100vw;
-    z-index: 1000;
-}
-
-
-/* responsiveness */
+/* Ensure table looks good on small screens */
 @media (max-width: 768px) {
-    form {
-        grid-template-columns: 1fr;
-    }
-
-    form textarea,
-    form button {
-        grid-column: span 1;
-    }
-
-    table {
-        display: block;
-        overflow-x: auto;
+    .table-responsive {
+        border: 0;
     }
 }

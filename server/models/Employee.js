@@ -2,35 +2,68 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
 const Employee = sequelize.define("Employee", {
-
     employeeId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
     },
-
-    name: DataTypes.STRING,
-
-    dob: DataTypes.DATEONLY,
-
-    ssn: DataTypes.STRING,
-
-    gender: DataTypes.STRING,
-
-    address: DataTypes.TEXT,
-
-    phone: DataTypes.STRING,
-
-    email: DataTypes.STRING,
-
-    preferredCommunication: DataTypes.STRING,
-
-    jobTitle: DataTypes.STRING,
-
-    department: DataTypes.STRING,
-
-    salary: DataTypes.DECIMAL(10,2)
-
+    firstName: {
+        type: DataTypes.STRING(40),
+        allowNull: false
+    },
+    lastName: {
+        type: DataTypes.STRING(40),
+        allowNull: false
+    },
+    dob: {
+        type: DataTypes.DATEONLY,
+        allowNull: false
+    },
+    ssn: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    gender: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    address: {
+        type: DataTypes.STRING(80),
+        allowNull: false
+    },
+    phone: {
+        type: DataTypes.STRING(10),
+        allowNull: false
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    preferredCommunication: {
+        type: DataTypes.ENUM('Email', 'Phone'),
+        allowNull: false
+    },
+    jobTitle: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    department: {
+        type: DataTypes.ENUM(
+            'Sales',
+            'Marketing',
+            'Human Resources',
+            'Finance',
+            'Engineering',
+            'Information Technology (IT)',
+            'Customer Support',
+            'Design'
+        ),
+        allowNull: false
+    },
+    salary: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false
+    }
 });
 
 module.exports = Employee;
