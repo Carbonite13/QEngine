@@ -25,7 +25,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "..", "public")));
 
-// Routes
+// Routes 
 app.get("/", (req, res) => res.redirect("/employees"));
 app.use("/employees", employeeRoutes);
 
