@@ -1,8 +1,11 @@
 require("dotenv").config();
+
+// imports
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const sequelize = require("./config/database");
+const logger = require("./utils/logger");
 const employeeRoutes = require("./routes/employeeRoutes");
 
 const app = express();
@@ -16,8 +19,8 @@ app.use(express.json());
 
 // Request Logger
 app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-    if (req.method === 'POST') console.log("Body:", JSON.stringify(req.body));
+    logger.info(`${req.method} ${req.url}`);
+    if (req.method === 'POST') logger.debug("Body: %o", req.body);
     next();
 });
 
@@ -31,7 +34,7 @@ app.use("/", employeeRoutes);
 // Error handling
 app.use((req, res) => res.status(404).send("Not Found"));
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    logger.error(err.stack);
     if (req.xhr || req.path.includes('/api')) {
         return res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
     }
@@ -41,10 +44,6 @@ app.use((err, req, res, next) => {
 // Database Sync and Start
 sequelize.sync({ alter: true })
     .then(() => {
-        console.log("*****************************************");
-        console.log("   QENGINE SERVER CONNECTED & SYNCED    ");
-        console.log(`   TIME: ${new Date().toISOString()}    `);
-        console.log("*****************************************");
-        app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+        app.listen(PORT, () => logger.info(`Server running on http://localhost:${PORT}`));
     })
-    .catch(err => console.error("Database connection error:", err));
+    .catch(err => logger.error("Database connection error: %o", err));

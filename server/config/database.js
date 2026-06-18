@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { Sequelize } = require("sequelize");
+const logger = require("../utils/logger");
 
 const sequelize = new Sequelize(
     process.env.DB_NAME,
@@ -9,7 +10,7 @@ const sequelize = new Sequelize(
         host: process.env.DB_HOST,
         port: process.env.DB_PORT || 5432, // Port added as per sequlize v7
         dialect: process.env.DB_DIALECT,
-        logging: console.log,
+        logging: (msg) => logger.debug(msg),
     },
 );
 

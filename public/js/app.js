@@ -2,9 +2,11 @@ $(document).ready(function () {
     const table = $('#employeeTable').DataTable({
         ajax: { url: '/api/all', dataSrc: '' },
         columns: [
-            { data: 'employeeId' },
             { data: null, render: d => `${d.firstName} ${d.lastName}` },
-            { data: 'department' },
+            { 
+                data: 'department',
+                render: d => window.MAPPINGS.DEPARTMENT_LABELS[d] || d
+            },
             { data: 'jobTitle' },
             { data: 'salary', render: $.fn.dataTable.render.number(',', '.', 2, '$') },
             {

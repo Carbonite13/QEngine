@@ -24,7 +24,7 @@ const Employee = sequelize.define("Employee", {
         allowNull: false
     },
     gender: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     address: {
@@ -40,7 +40,7 @@ const Employee = sequelize.define("Employee", {
         allowNull: false
     },
     preferredCommunication: {
-        type: DataTypes.ENUM('Email', 'Phone'),
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     jobTitle: {
@@ -48,16 +48,7 @@ const Employee = sequelize.define("Employee", {
         allowNull: false
     },
     department: {
-        type: DataTypes.ENUM(
-            'Sales',
-            'Marketing',
-            'Human Resources',
-            'Finance',
-            'Engineering',
-            'Information Technology (IT)',
-            'Customer Support',
-            'Design'
-        ),
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     salary: {
