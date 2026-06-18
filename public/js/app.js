@@ -1,6 +1,6 @@
 $(document).ready(function () {
     const table = $('#employeeTable').DataTable({
-        ajax: { url: '/employees/api/all', dataSrc: '' },
+        ajax: { url: '/api/all', dataSrc: '' },
         columns: [
             { data: 'employeeId' },
             { data: null, render: d => `${d.firstName} ${d.lastName}` },
@@ -18,7 +18,7 @@ $(document).ready(function () {
     });
 
     // SSN Formatting
-    $('#ssn').on('input', function() {
+    $('#ssn').on('input', function () {
         let v = $(this).val().replace(/\D/g, '').slice(0, 9);
         if (v.length > 5) v = `${v.slice(0, 3)}-${v.slice(3, 5)}-${v.slice(5)}`;
         else if (v.length > 3) v = `${v.slice(0, 3)}-${v.slice(3)}`;
@@ -26,7 +26,7 @@ $(document).ready(function () {
     });
 
     // Validation
-    $.validator.addMethod("ageRange", function(v) {
+    $.validator.addMethod("ageRange", function (v) {
         if (!v) return true;
         const d = new Date(v), t = new Date();
         const min = new Date(), max = new Date(), ageLimit = new Date();
@@ -65,7 +65,7 @@ $(document).ready(function () {
 
     $('#employeeTable').on('click', '.edit-btn', function () {
         const id = $(this).data('id');
-        $.get(`/employees/api/${id}`, data => {
+        $.get(`/api/${id}`, data => {
             validator.resetForm();
             Object.keys(data).forEach(k => $(`#${k}`).val(data[k]));
             $('#modalTitle').text('Edit Employee');
@@ -76,22 +76,22 @@ $(document).ready(function () {
     $('#employeeForm').on('submit', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        
+
         if (!$(this).valid()) return false;
-        
+
         const id = $('#employeeId').val();
-        const url = id ? `/employees/api/edit/${id}` : '/employees/api/create';
-        
+        const url = id ? `/api/edit/${id}` : '/api/create';
+
         $.ajax({
             url: url,
             method: 'POST',
             data: $(this).serialize(),
-            success: function() {
+            success: function () {
                 $('#employeeModal').modal('hide');
                 table.ajax.reload();
                 Swal.fire('Success', 'Record saved!', 'success');
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 Swal.fire('Error', xhr.responseJSON?.error || 'Failed to save', 'error');
             }
         });
@@ -103,7 +103,7 @@ $(document).ready(function () {
         Swal.fire({
             title: 'Delete?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes'
         }).then(res => {
-            if (res.isConfirmed) $.post(`/employees/api/delete/${id}`, () => {
+            if (res.isConfirmed) $.post(`/api/delete/${id}`, () => {
                 table.ajax.reload();
                 Swal.fire('Deleted!', '', 'success');
             });

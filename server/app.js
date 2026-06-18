@@ -26,8 +26,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 // Routes 
-app.get("/", (req, res) => res.redirect("/employees"));
-app.use("/employees", employeeRoutes);
+app.use("/", employeeRoutes);
 
 // Error handling
 app.use((req, res) => res.status(404).send("Not Found"));
