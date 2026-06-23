@@ -137,5 +137,151 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  let table;
+  let editingId = null;
+
+  $(document).ready(function () {
+    // ── Initialize DataTable ────────────────────────────────────────────────
+    table = $('#employeeTable').DataTable({
+      ajax: {
+        url: '/employees',
+        dataSrc: 'data'
+      },
+      columns: [
+        { data: 'employeeId' },
+        {
+          data: null,
+          render: (d) => `${d.firstName} ${d.lastName}`
+        },
+        { data: 'department' },
+        { data: 'jobTitle' },
+        {
+          data: 'salary',
+          render: (val) => '$' + parseFloat(val).toLocaleString('en-US', { minimumFractionDigits: 2 })
+        },
+        {
+          data: 'employeeId',
+          orderable: false,
+          render: (id) =>
+            `<button class="btn btn-sm btn-warning edit-btn" data-id="${id}">Edit</button> ` +
+            `<button class="btn btn-sm btn-danger delete-btn" data-id="${id}">Delete</button>`
+        }
+      ],
+      order: [[0, 'desc']]
+    });
+
+    // ── Open modal for ADD ──────────────────────────────────────────────────
+    $('#addEmployeeBtn').on('click', function () {
+      editingId = null;
+      $('#modalTitle').text('Add Employee');
+      $('#employeeForm')[0].reset();
+      $('#employeeId').val('');
+      $('#employeeModal').modal('show');
+    });
+
+    // ── Open modal for EDIT ─────────────────────────────────────────────────
+    $('#employeeTable').on('click', '.edit-btn', function () {
+      const id = $(this).data('id');
+      editingId = id;
+      $('#modalTitle').text('Edit Employee');
+
+      $.get(`/employees/${id}`, function (res) {
+        if (!res.success) return;
+        const e = res.data;
+        $('#employeeId').val(e.employeeId);
+        $('#firstName').val(e.firstName);
+        $('#lastName').val(e.lastName);
+        $('#dateOfBirth').val(e.dateOfBirth);
+        $('#socialSecurityNumber').val(e.socialSecurityNumber);
+        $('#gender').val(e.gender);
+        $('#address').val(e.address);
+        $('#phoneNumber').val(e.phoneNumber);
+        $('#emailAddress').val(e.emailAddress);
+        $('#preferredCommunication').val(e.preferredCommunication);
+        $('#jobTitle').val(e.jobTitle);
+        $('#department').val(e.department);
+        $('#salary').val(e.salary);
+        $('#employeeModal').modal('show');
+      }).fail(function () {
+        Swal.fire('Error', 'Could not load employee data.', 'error');
+      });
+    });
+
+    // ── DELETE ──────────────────────────────────────────────────────────────
+    $('#employeeTable').on('click', '.delete-btn', function () {
+      const id = $(this).data('id');
+      Swal.fire({
+        title: 'Delete Employee?',
+        text: 'This action cannot be undone.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, delete'
+      }).then((result) => {
+        if (!result.isConfirmed) return;
+        $.ajax({
+          url: `/employees/${id}`,
+          method: 'DELETE',
+          success: function (res) {
+            if (res.success) {
+              Swal.fire('Deleted!', res.message, 'success');
+              table.ajax.reload();
+            }
+          },
+          error: function (xhr) {
+            const msg = xhr.responseJSON?.message || 'Delete failed.';
+            Swal.fire('Error', msg, 'error');
+          }
+        });
+      });
+    });
+
+    // ── SAVE (Create / Update) ──────────────────────────────────────────────
+    $('#employeeForm').on('submit', function (e) {
+      e.preventDefault();
+
+      const formData = {
+        firstName:              $('#firstName').val().trim(),
+        lastName:               $('#lastName').val().trim(),
+        dateOfBirth:            $('#dateOfBirth').val(),
+        socialSecurityNumber:   $('#socialSecurityNumber').val().trim(),
+        gender:                 $('#gender').val(),
+        address:                $('#address').val().trim(),
+        phoneNumber:            $('#phoneNumber').val().trim(),
+        emailAddress:           $('#emailAddress').val().trim(),
+        preferredCommunication: $('#preferredCommunication').val(),
+        jobTitle:               $('#jobTitle').val().trim(),
+        department:             $('#department').val(),
+        salary:                 $('#salary').val()
+      };
+
+      const isEdit  = !!editingId;
+      const url     = isEdit ? `/employees/${editingId}` : '/employees';
+      const method  = isEdit ? 'PUT' : 'POST';
+
+      $.ajax({
+        url,
+        method,
+        contentType: 'application/json',
+        data: JSON.stringify(formData),
+        success: function (res) {
+          if (res.success) {
+            $('#employeeModal').modal('hide');
+            Swal.fire('Success', res.message, 'success');
+            table.ajax.reload();
+          }
+        },
+        error: function (xhr) {
+          const json = xhr.responseJSON;
+          const errors = json?.errors ? json.errors.join('\n') : (json?.message || 'Save failed.');
+          Swal.fire('Validation Error', errors, 'error');
+        }
+      });
+    });
+  });
+</script>
 </body>
 </html>
