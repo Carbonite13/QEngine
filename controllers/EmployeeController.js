@@ -30,7 +30,7 @@ const employeeSchema = Joi.object({
     salary: Joi.number().positive().precision(2).required(),
 });
 
-function renderPage(req, res) {
+async function renderPage(req, res) {
     // res.render("employees", { CONSTANTS });
     Promise.resolve({ CONSTANTS }).then(data => {
         return res.render("employees", data);
@@ -50,13 +50,13 @@ function mapEmployee(e) {
     };
 };
 
-function getAll(req, res, next) {
+async function getAll(req, res, next) {
     employeeService.getAll()
         .then((employees) => res.json({ success: true, data: employees.map(mapEmployee) }))
         .catch(next);
 };
 
-function get(req, res, next) {
+async function get(req, res, next) {
     employeeService.get(req.params.id)
         .then((employee) => {
             if (!employee) {
@@ -70,7 +70,7 @@ function get(req, res, next) {
         .catch(next);
 };
 
-function create(req, res, next) {
+async function create(req, res, next) {
     const { error, value } = employeeSchema.validate(req.body, {
         abortEarly: false,
         convert: true,
@@ -95,7 +95,7 @@ function create(req, res, next) {
         .catch(next);
 };
 
-function update(req, res, next) {
+async function update(req, res, next) {
     const { error, value } = employeeSchema.validate(req.body, {
         abortEarly: false,
         convert: true,
@@ -126,7 +126,7 @@ function update(req, res, next) {
         .catch(next);
 };
 
-function remove(req, res, next) {
+async function remove(req, res, next) {
     employeeService.delete(req.params.id)
         .then((deleted) => {
             if (!deleted) {

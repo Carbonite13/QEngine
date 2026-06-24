@@ -34,17 +34,17 @@ Employee.init(
             allowNull: false,
             validate: {
                 notEmpty: true,
-                isPast(value) {
-                    if (new Date(value) >= new Date()) throw new Error("Date of birth must be in the past");
-                },
-                minAge(value) {
-                    const dob = new Date(value);
-                    const today = new Date();
-                    let age = today.getFullYear() - dob.getFullYear();
-                    const monthDiff = today.getMonth() - dob.getMonth();
-                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
-                    if (age < CONSTANTS.MIN_AGE) throw new Error(`Employee must be at least ${CONSTANTS.MIN_AGE} years old`);
-                },
+                // isPast(value) {
+                //     if (new Date(value) >= new Date()) throw new Error("Date of birth must be in the past");
+                // },
+                // minAge(value) {
+                //     const dob = new Date(value);
+                //     const today = new Date();
+                //     let age = today.getFullYear() - dob.getFullYear();
+                //     const monthDiff = today.getMonth() - dob.getMonth();
+                //     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
+                //     if (age < CONSTANTS.MIN_AGE) throw new Error(`Employee must be at least ${CONSTANTS.MIN_AGE} years old`);
+                // },
             },
         },
         socialSecurityNumber: {

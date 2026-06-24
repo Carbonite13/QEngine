@@ -19,11 +19,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-import * as employeeController from "./controllers/EmployeeController.js";
-
-app.get("/", employeeController.renderPage);
-
-app.use("/employees", employeeRoutes);
+app.use("/", employeeRoutes);
 
 app.use((req, res, next) => {
     const err = new Error("Route not found");
