@@ -17,7 +17,7 @@ Employee.init(
             validate: {
                 notEmpty: true,
                 len: [CONSTANTS.NAME_MIN, CONSTANTS.NAME_MAX],
-                is: CONSTANTS.REGEX.NAME,
+                is: CONSTANTS.REGEX.ALPHA_EXTENDED,
             },
         },
         lastName: {
@@ -26,7 +26,7 @@ Employee.init(
             validate: {
                 notEmpty: true,
                 len: [CONSTANTS.NAME_MIN, CONSTANTS.NAME_MAX],
-                is: CONSTANTS.REGEX.NAME,
+                is: CONSTANTS.REGEX.ALPHA_EXTENDED,
             },
         },
         dateOfBirth: {

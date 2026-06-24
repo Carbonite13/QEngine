@@ -23,7 +23,7 @@ const employeeSchema = Joi.object({
     gender: Joi.number().integer().valid(...Object.keys(CONSTANTS.GENDERS).map(Number)).required(),
     address: Joi.string().trim().min(CONSTANTS.ADDRESS_MIN).max(CONSTANTS.ADDRESS_MAX).required(),
     phoneNumber: Joi.string().pattern(CONSTANTS.REGEX.PHONE).required(),
-    emailAddress: Joi.string().pattern(CONSTANTS.REGEX.EMAIL).required(),
+    emailAddress: Joi.string().pattern(CONSTANTS.REGEX.EMAIL_REGEX).required(),
     preferredCommunication: Joi.number().integer().valid(...Object.keys(CONSTANTS.COMMUNICATIONS).map(Number)).required(),
     jobTitle: Joi.string().trim().min(1).max(CONSTANTS.JOBTITLE_MAX).required(),
     department: Joi.number().integer().valid(...Object.keys(CONSTANTS.DEPARTMENTS).map(Number)).required(),
@@ -31,7 +31,13 @@ const employeeSchema = Joi.object({
 });
 
 function renderPage(req, res) {
-    res.render("employees", { CONSTANTS });
+    // res.render("employees", { CONSTANTS });
+    Promise.resolve({ CONSTANTS }).then(data => {
+        return res.render("employees", data);
+    }).catch(err => {
+        console.error("Error loading employee page:", err);
+        return res.status(500).send("Error loading employee page");
+    });
 };
 
 function mapEmployee(e) {

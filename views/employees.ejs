@@ -8,22 +8,17 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
   <style>
     /* Hint text below inputs */
-    .form-text { font-size: .78rem; color: #6c757d; margin-top: 2px; }
+    .form-text { font-size: .78rem; color: #6c757d; margin-top: 2px; } 
 
-    /* Keep invalid-feedback always visible when field is dirty */
-    .was-validated .form-control:invalid ~ .invalid-feedback,
-    .was-validated .form-control:valid   ~ .valid-feedback,
-    .field-dirty .form-control.is-invalid ~ .invalid-feedback { display: block; }
-
-    /* Make invalid-feedback show even outside native :invalid */
-    .form-control.is-invalid ~ .invalid-feedback { display: block; }
-    .form-control.is-valid   ~ .valid-feedback   { display: block; }
+    /* Make invalid-feedback show even outside native :invalid standard wrappers */
+    .form-control.is-invalid ~ .invalid-feedback { display: block; } 
+    .form-control.is-valid   ~ .valid-feedback   { display: block; } 
 
     .modal-body .form-group { margin-bottom: .85rem; }
-    label { font-weight: 500; font-size: .88rem; margin-bottom: 2px; }
+    label { font-weight: 500; font-size: .88rem; margin-bottom: 2px; } 
 
-    /* character counter */
-    .char-count { float: right; font-size: .75rem; color: #aaa; }
+    /* character counter styling */
+    .char-count { float: right; font-size: .75rem; color: #aaa; } 
   </style>
 </head>
 <body>
@@ -42,13 +37,12 @@
         <th>Job Title</th>
         <th>Salary</th>
         <th>Actions</th>
-      </tr>
+      </tr> 
     </thead>
     <tbody></tbody>
   </table>
 </div>
 
-<!-- modal -->
 <div class="modal fade" id="employeeModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -61,145 +55,145 @@
         <div class="modal-body">
           <input type="hidden" id="employeeId" name="employeeId">
 
-          <!-- Row 1 – First / Last Name -->
-          <div class="form-row">
+          <div class="form-row"> 
             <div class="form-group col-md-6">
               <label for="firstName">First Name <span class="text-danger">*</span></label>
               <input type="text" class="form-control" id="firstName" name="firstName"
-                     placeholder="e.g. John" minlength="<%= CONSTANTS.NAME_MIN %>" maxlength="<%= CONSTANTS.NAME_MAX %>" autocomplete="given-name" required>
+                     placeholder="e.g. John" 
+                     minlength="<%= CONSTANTS.NAME_MIN %>" 
+                     maxlength="<%= CONSTANTS.NAME_MAX %>" 
+                     pattern="[a-zA-Z\s'.-]+" 
+                     autocomplete="given-name" required> 
               <div class="invalid-feedback">Letters, spaces, hyphens and apostrophes only (<%= CONSTANTS.NAME_MIN %>–<%= CONSTANTS.NAME_MAX %> chars).</div>
               <small class="form-text">Legal first name as it appears on official documents.</small>
             </div>
             <div class="form-group col-md-6">
-              <label for="lastName">Last Name <span class="text-danger">*</span></label>
+              <label for="lastName">Last Name <span class="text-danger">*</span></label> 
               <input type="text" class="form-control" id="lastName" name="lastName"
-                     placeholder="e.g. Doe" minlength="<%= CONSTANTS.NAME_MIN %>" maxlength="<%= CONSTANTS.NAME_MAX %>" autocomplete="family-name" required>
+                     placeholder="e.g. Doe" 
+                     minlength="<%= CONSTANTS.NAME_MIN %>" 
+                     maxlength="<%= CONSTANTS.NAME_MAX %>" 
+                     pattern="[a-zA-Z\s'.-]+" 
+                     autocomplete="family-name" required> 
               <div class="invalid-feedback">Letters, spaces, hyphens and apostrophes only (<%= CONSTANTS.NAME_MIN %>–<%= CONSTANTS.NAME_MAX %> chars).</div>
               <small class="form-text">Legal last name — include suffix (Jr., III) if applicable.</small>
             </div>
           </div>
 
-          <!-- Row 2 – DOB / SSN -->
-          <div class="form-row">
+          <div class="form-row"> 
             <div class="form-group col-md-6">
               <label for="dateOfBirth">Date of Birth <span class="text-danger">*</span></label>
               <% 
                 const maxD = new Date();
                 maxD.setFullYear(maxD.getFullYear() - CONSTANTS.MIN_AGE);
-                const maxDob = maxD.toISOString().split('T')[0];
+                const maxDob = maxD.toISOString().split('T')[0]; 
               %>
               <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth"
                      autocomplete="bday" max="<%= maxDob %>" required>
-              <div class="invalid-feedback" id="dobError">Employee must be at least <%= CONSTANTS.MIN_AGE %> years old.</div>
-              <small class="form-text">Must be in the past and employee must be ≥ <%= CONSTANTS.MIN_AGE %> years old.</small>
+              <div class="invalid-feedback" id="dobError">Please enter a valid date. Employee must be at least <%= CONSTANTS.MIN_AGE %> years old.</div>
+              <small class="form-text">Must be a valid calendar date and employee must be ≥ <%= CONSTANTS.MIN_AGE %> years old.</small> 
             </div>
             <div class="form-group col-md-6">
               <label for="socialSecurityNumber">Social Security Number <span class="text-danger">*</span></label>
               <input type="text" class="form-control" id="socialSecurityNumber" name="socialSecurityNumber"
-                     placeholder="000-00-0000" minlength="4" maxlength="20" inputmode="numeric" autocomplete="off" required>
-              <div class="invalid-feedback">Enter a valid SSN.</div>
+                     placeholder="000-00-0000" minlength="11" maxlength="11" autocomplete="off" required> 
+              <div class="invalid-feedback">Enter a valid 9-digit SSN (formatted as 000-00-0000).</div>
               <small class="form-text">Dashes are added automatically as you type.</small>
             </div>
           </div>
 
-          <!-- Row 3 – Gender / Address -->
-          <div class="form-row">
+          <div class="form-row"> 
             <div class="form-group col-md-4">
               <label for="gender">Gender <span class="text-danger">*</span></label>
               <select class="form-control" id="gender" name="gender" required>
                 <option value="">— Select —</option>
                 <% Object.entries(CONSTANTS.GENDERS).forEach(([key, g]) => { %>
-                  <option value="<%= key %>"><%= g %></option>
+                  <option value="<%= key %>"><%= g %></option> 
                 <% }) %>
               </select>
               <div class="invalid-feedback">Please select a gender.</div>
             </div>
             <div class="form-group col-md-8">
-              <label for="address">
+              <label for="address"> 
                 Address <span class="text-danger">*</span>
-                <span class="char-count"><span id="addressCount">0</span>/<%= CONSTANTS.ADDRESS_MAX %></span>
+                <span class="char-count"><span id="addressCount">0</span>/<%= CONSTANTS.ADDRESS_MAX %></span> 
               </label>
               <input type="text" class="form-control" id="address" name="address"
-                     placeholder="e.g. 123 Main St, Springfield, IL 62701"
-                     minlength="<%= CONSTANTS.ADDRESS_MIN %>" maxlength="<%= CONSTANTS.ADDRESS_MAX %>" autocomplete="street-address" required>
+                     placeholder="e.g. 123 Main St, Springfield, IL 62701" 
+                     minlength="<%= CONSTANTS.ADDRESS_MIN %>" maxlength="<%= CONSTANTS.ADDRESS_MAX %>" autocomplete="street-address" required> 
               <div class="invalid-feedback">Address must be between <%= CONSTANTS.ADDRESS_MIN %> and <%= CONSTANTS.ADDRESS_MAX %> characters.</div>
               <small class="form-text">Include street, city, state, and ZIP code.</small>
             </div>
-          </div>
+          </div> 
 
-          <!-- Row 4 – Phone / Email -->
           <div class="form-row">
             <div class="form-group col-md-6">
               <label for="phoneNumber">Phone Number <span class="text-danger">*</span></label>
               <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
-                     placeholder="e.g. 555-867-5309" minlength="10" maxlength="12" inputmode="numeric"
-                     autocomplete="tel" required>
-              <div class="invalid-feedback">Enter exactly 10 digits (dashes allowed).</div>
+                     placeholder="e.g. 555-867-5309" minlength="12" maxlength="12" autocomplete="tel" required> 
+              <div class="invalid-feedback">Enter a valid 10-digit phone number.</div>
               <small class="form-text">10-digit US number; dashes added automatically.</small>
             </div>
             <div class="form-group col-md-6">
-              <label for="emailAddress">Email Address <span class="text-danger">*</span></label>
+              <label for="emailAddress">Email Address <span class="text-danger">*</span></label> 
               <input type="email" class="form-control" id="emailAddress" name="emailAddress"
-                     placeholder="e.g. john.doe@company.com" autocomplete="email" required>
+                     placeholder="e.g. john.doe@company.com" autocomplete="email" 
+                     pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" required> 
               <div class="invalid-feedback">Enter a valid email address (e.g. user@domain.com).</div>
               <small class="form-text">Work email preferred.</small>
             </div>
           </div>
 
-          <!-- Row 5 – Preferred Communication / Job Title -->
           <div class="form-row">
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-6"> 
               <label for="preferredCommunication">Preferred Communication <span class="text-danger">*</span></label>
               <select class="form-control" id="preferredCommunication" name="preferredCommunication" required>
                 <option value="">— Select —</option>
                 <% Object.entries(CONSTANTS.COMMUNICATIONS).forEach(([key, comm]) => { %>
-                  <option value="<%= key %>"><%= comm %></option>
+                  <option value="<%= key %>"><%= comm %></option> 
                 <% }) %>
               </select>
               <div class="invalid-feedback">Please select a preferred communication method.</div>
               <small class="form-text">How should we contact this employee?</small>
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-6"> 
               <label for="jobTitle">
                 Job Title <span class="text-danger">*</span>
-                <span class="char-count"><span id="jobTitleCount">0</span>/<%= CONSTANTS.JOBTITLE_MAX %></span>
+                <span class="char-count"><span id="jobTitleCount">0</span>/<%= CONSTANTS.JOBTITLE_MAX %></span> 
               </label>
               <input type="text" class="form-control" id="jobTitle" name="jobTitle"
-                     placeholder="e.g. Senior Software Engineer" maxlength="<%= CONSTANTS.JOBTITLE_MAX %>" required>
+                     placeholder="e.g. Senior Software Engineer" maxlength="<%= CONSTANTS.JOBTITLE_MAX %>" required> 
               <div class="invalid-feedback">Job title is required (max <%= CONSTANTS.JOBTITLE_MAX %> characters).</div>
               <small class="form-text">Use the official title from the employment contract.</small>
             </div>
           </div>
 
-          <!-- Row 6 – Department / Salary -->
-          <div class="form-row">
+          <div class="form-row"> 
             <div class="form-group col-md-6">
               <label for="department">Department <span class="text-danger">*</span></label>
               <select class="form-control" id="department" name="department" required>
                 <option value="">— Select —</option>
                 <% Object.entries(CONSTANTS.DEPARTMENTS).forEach(([key, dept]) => { %>
-                  <option value="<%= key %>"><%= dept %></option>
+                  <option value="<%= key %>"><%= dept %></option> 
                 <% }) %>
               </select>
               <div class="invalid-feedback">Please select a department.</div>
             </div>
             <div class="form-group col-md-6">
-              <label for="salary">Annual Salary (USD) <span class="text-danger">*</span></label>
+              <label for="salary">Annual Salary (USD) <span class="text-danger">*</span></label> 
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text">$</span>
                 </div>
                 <input type="number" class="form-control" id="salary" name="salary"
-                       placeholder="e.g. 75000" min="0" step="0.01" required>
+                       placeholder="e.g. 75000" min="0" step="0.01" required> 
                 <div class="invalid-feedback">Enter a valid positive salary (e.g. 75000.00).</div>
               </div>
               <small class="form-text mt-1">Gross annual compensation before tax.</small>
             </div>
           </div>
 
-        </div><!-- /modal-body -->
-
-        <div class="modal-footer d-flex justify-content-between align-items-center">
+        </div><div class="modal-footer d-flex justify-content-between align-items-center"> 
           <small class="text-muted"><span class="text-danger">*</span> Required fields</small>
           <div>
             <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">Cancel</button>
@@ -210,18 +204,33 @@
     </div>
   </div>
 </div>
-<!-- end modal -->
-
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  let table;
-  let editingId = null;
+  let table; 
+  let editingId = null; 
 
-  function digitsOnly(str) { return str.replace(/\D/g, ''); }
+  function digitsOnly(str) { return str.replace(/\D/g, ''); } 
+
+  function updateCharCount(inputSelector, countSelector) {
+    $(countSelector).text($(inputSelector).val().length);
+  }
+
+  // Active validation styling handler
+  function runFieldValidation(input) {
+    const $el = $(input);
+    const isValid = input.checkValidity();
+    
+    if (!isValid) {
+      $el.addClass('is-invalid').removeClass('is-valid');
+    } else {
+      $el.addClass('is-valid').removeClass('is-invalid');
+    }
+    return isValid;
+  }
 
   $(document).ready(function () {
 
@@ -232,7 +241,7 @@
         { data: null, render: d => `${d.firstName} ${d.lastName}` },
         { data: 'departmentName' },
         { data: 'jobTitle' },
-        { data: 'salary',     render: v => '$' + parseFloat(v).toLocaleString('en-US', { minimumFractionDigits: 2 }) },
+        { data: 'salary',     render: v => '$' + parseFloat(v).toLocaleString('en-US', { minimumFractionDigits: 2 }) }, 
         {
           data: 'employeeId', orderable: false,
           render: id =>
@@ -241,6 +250,45 @@
         }
       ],
       order: [[0, 'desc']]
+    }); 
+
+    // Real-time SSN Hyphenation
+    $('#socialSecurityNumber').on('input', function() {
+      let val = digitsOnly($(this).val()).substring(0, 9);
+      if (val.length > 5) {
+        val = `${val.substring(0, 3)}-${val.substring(3, 5)}-${val.substring(5)}`;
+      } else if (val.length > 3) {
+        val = `${val.substring(0, 3)}-${val.substring(3)}`;
+      }
+      $(this).val(val);
+      runFieldValidation(this);
+    });
+
+    // Real-time Phone Number Hyphenation
+    $('#phoneNumber').on('input', function() {
+      let val = digitsOnly($(this).val()).substring(0, 10);
+      if (val.length > 6) {
+        val = `${val.substring(0, 3)}-${val.substring(3, 6)}-${val.substring(6)}`;
+      } else if (val.length > 3) {
+        val = `${val.substring(0, 3)}-${val.substring(3)}`;
+      }
+      $(this).val(val);
+      runFieldValidation(this);
+    });
+
+    // Active Input Field Counter Tracking
+    $('#address').on('input', function() {
+      updateCharCount(this, '#addressCount');
+      runFieldValidation(this);
+    });
+
+    $('#jobTitle').on('input', function() {
+      updateCharCount(this, '#jobTitleCount');
+      runFieldValidation(this);
+    });
+
+    $('#employeeForm .form-control').on('blur change', function() {
+      runFieldValidation(this);
     });
 
     $('#addEmployeeBtn').on('click', function () {
@@ -248,8 +296,10 @@
       $('#modalTitle').text('Add Employee');
       $('#employeeForm')[0].reset();
       $('#employeeId').val('');
-      $('#employeeForm .form-control').removeClass('is-invalid');
-      $('#employeeModal').modal('show');
+      $('#employeeForm .form-control').removeClass('is-invalid is-valid');
+      updateCharCount('#address', '#addressCount');
+      updateCharCount('#jobTitle', '#jobTitleCount');
+      $('#employeeModal').modal('show'); 
     });
 
     $('#employeeTable').on('click', '.edit-btn', function () {
@@ -258,26 +308,26 @@
       
       editingId = e.employeeId;
       $('#modalTitle').text('Edit Employee');
+      $('#employeeForm .form-control').removeClass('is-invalid is-valid');
 
-      $('#employeeForm .form-control').removeClass('is-invalid');
       $('#employeeId').val(e.employeeId);
       $('#firstName').val(e.firstName);
       $('#lastName').val(e.lastName);
       $('#dateOfBirth').val(e.dateOfBirth ? e.dateOfBirth.split('T')[0] : '');
-      $('#socialSecurityNumber').val(e.socialSecurityNumber);
+      $('#socialSecurityNumber').val(e.socialSecurityNumber).trigger('input');
       $('#gender').val(e.gender);
-      $('#address').val(e.address);
-      $('#phoneNumber').val(e.phoneNumber);
+      $('#address').val(e.address).trigger('input');
+      $('#phoneNumber').val(e.phoneNumber).trigger('input'); 
       $('#emailAddress').val(e.emailAddress);
       $('#preferredCommunication').val(e.preferredCommunication);
-      $('#jobTitle').val(e.jobTitle);
+      $('#jobTitle').val(e.jobTitle).trigger('input');
       $('#department').val(e.department);
       $('#salary').val(e.salary);
-      $('#employeeModal').modal('show');
+      $('#employeeModal').modal('show'); 
     });
 
-    // delete employee confirmation mo
-    $('#employeeTable').on('click', '.delete-btn', function () {
+    // Promise-based Delete Action Chain
+    $('#employeeTable').on('click', '.delete-btn', function () { 
       const btn = $(this);
       const id = btn.data('id');
       
@@ -287,73 +337,86 @@
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
-        cancelButtonColor: '#6c757d',
+        cancelButtonColor: '#6c757d', 
         confirmButtonText: 'Yes, delete'
       }).then(result => {
         if (!result.isConfirmed) return;
-        $.ajax({
-          url: `/employees/${id}`, method: 'DELETE',
-          success(res) {
-            if (res.success) { 
-              Swal.fire('Deleted!', res.message, 'success'); 
-              table.row(btn.closest('tr')).remove().draw(false); 
-            }
-          },
-          error(xhr) {
-            Swal.fire('Error', xhr.responseJSON?.message || 'Delete failed.', 'error');
-          }
-        });
+
+        return $.ajax({ url: `/employees/${id}`, method: 'DELETE' });
+      })
+      .then(res => {
+        if (res && res.success) { 
+          Swal.fire('Deleted!', res.message, 'success'); 
+          table.row(btn.closest('tr')).remove().draw(false); 
+        }
+      })
+      .catch(xhr => {
+        if(xhr) Swal.fire('Error', xhr.responseJSON?.message || 'Delete failed.', 'error');
       });
     });
 
-    $('#employeeForm').on('submit', function (ev) {
+    // Promise-based Form Submission Chain
+    $('#employeeForm').on('submit', function (ev) { 
       ev.preventDefault();
+
+      let formIsValid = true;
+      $('#employeeForm .form-control').each(function() {
+        if (!runFieldValidation(this)) {
+          formIsValid = false;
+        }
+      });
+
+      if (!formIsValid) {
+        Swal.fire({ icon: 'error', title: 'Invalid Form Data', text: 'Please check your values and try again.' });
+        return;
+      }
 
       const formData = {
         firstName:              $('#firstName').val().trim(),
         lastName:               $('#lastName').val().trim(),
         dateOfBirth:            $('#dateOfBirth').val(),
         socialSecurityNumber:   $('#socialSecurityNumber').val().trim(),
-        gender:                 $('#gender').val(),
+        gender:                 $('#gender').val(), 
         address:                $('#address').val().trim(),
         phoneNumber:            digitsOnly($('#phoneNumber').val()),   
         emailAddress:           $('#emailAddress').val().trim(),
         preferredCommunication: $('#preferredCommunication').val(),
-        jobTitle:               $('#jobTitle').val().trim(),
+        jobTitle:               $('#jobTitle').val().trim(), 
         department:             $('#department').val(),
         salary:                 $('#salary').val()
       };
 
       const isEdit = !!editingId;
       const url    = isEdit ? `/employees/${editingId}` : '/employees';
-      const method = isEdit ? 'PUT' : 'POST';
+      const method = isEdit ? 'PUT' : 'POST'; 
 
       $('#saveBtn').prop('disabled', true).text('Saving…');
 
-      $.ajax({
-        url, method,
+      $.ajax({ 
+        url, 
+        method,
         contentType: 'application/json',
-        data: JSON.stringify(formData),
-        success(res) {
-          if (res.success) {
-            $('#employeeModal').modal('hide');
-            Swal.fire({ icon: 'success', title: 'Success', text: res.message, timer: 2000, showConfirmButton: false });
-            table.ajax.reload();
-          }
-        },
-        error(xhr) {
-          const json   = xhr.responseJSON;
-          const errors = json?.errors ? json.errors.join('\n• ') : (json?.message || 'Save failed.');
-          Swal.fire({ icon: 'error', title: 'Validation Error', html: '• ' + errors.replace(/\n/g, '<br>• ') });
-        },
-        complete() {
-          $('#saveBtn').prop('disabled', false).text('Save Employee');
+        data: JSON.stringify(formData)
+      })
+      .then(res => {
+        if (res.success) { 
+          $('#employeeModal').modal('hide');
+          Swal.fire({ icon: 'success', title: 'Success', text: res.message, timer: 2000, showConfirmButton: false });
+          table.ajax.reload();
         }
+      })
+      .catch(xhr => {
+        const json   = xhr.responseJSON;
+        const errors = json?.errors ? json.errors.join('\n• ') : (json?.message || 'Save failed.');
+        Swal.fire({ icon: 'error', title: 'Validation Error', html: '• ' + errors.replace(/\n/g, '<br>• ') });
+      })
+      .always(() => { 
+        $('#saveBtn').prop('disabled', false).text('Save Employee');
       });
-    });
+    }); 
 
     $('#employeeModal').on('hidden.bs.modal', function() {
-      $('#employeeForm .form-control').removeClass('is-invalid');
+      $('#employeeForm .form-control').removeClass('is-invalid is-valid');
     });
   });
 </script>
