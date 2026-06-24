@@ -1,5 +1,5 @@
 import express from "express";
-import * as c from "../controllers/employeeController.js";
+import * as c from "../controllers/EmployeeController.js";
 const router = express.Router();
 
 router.get("/", c.getAll);

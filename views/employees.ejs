@@ -66,15 +66,15 @@
             <div class="form-group col-md-6">
               <label for="firstName">First Name <span class="text-danger">*</span></label>
               <input type="text" class="form-control" id="firstName" name="firstName"
-                     placeholder="e.g. John" maxlength="<%= C.NAME_MAX %>" autocomplete="given-name">
-              <div class="invalid-feedback">Letters, spaces, hyphens and apostrophes only (<%= C.NAME_MIN %>–<%= C.NAME_MAX %> chars).</div>
+                     placeholder="e.g. John" maxlength="<%= CONSTANTS.NAME_MAX %>" autocomplete="given-name">
+              <div class="invalid-feedback">Letters, spaces, hyphens and apostrophes only (<%= CONSTANTS.NAME_MIN %>–<%= CONSTANTS.NAME_MAX %> chars).</div>
               <small class="form-text">Legal first name as it appears on official documents.</small>
             </div>
             <div class="form-group col-md-6">
               <label for="lastName">Last Name <span class="text-danger">*</span></label>
               <input type="text" class="form-control" id="lastName" name="lastName"
-                     placeholder="e.g. Doe" maxlength="<%= C.NAME_MAX %>" autocomplete="family-name">
-              <div class="invalid-feedback">Letters, spaces, hyphens and apostrophes only (<%= C.NAME_MIN %>–<%= C.NAME_MAX %> chars).</div>
+                     placeholder="e.g. Doe" maxlength="<%= CONSTANTS.NAME_MAX %>" autocomplete="family-name">
+              <div class="invalid-feedback">Letters, spaces, hyphens and apostrophes only (<%= CONSTANTS.NAME_MIN %>–<%= CONSTANTS.NAME_MAX %> chars).</div>
               <small class="form-text">Legal last name — include suffix (Jr., III) if applicable.</small>
             </div>
           </div>
@@ -85,8 +85,8 @@
               <label for="dateOfBirth">Date of Birth <span class="text-danger">*</span></label>
               <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth"
                      autocomplete="bday">
-              <div class="invalid-feedback" id="dobError">Employee must be at least <%= C.MIN_AGE %> years old.</div>
-              <small class="form-text">Must be in the past and employee must be ≥ <%= C.MIN_AGE %> years old.</small>
+              <div class="invalid-feedback" id="dobError">Employee must be at least <%= CONSTANTS.MIN_AGE %> years old.</div>
+              <small class="form-text">Must be in the past and employee must be ≥ <%= CONSTANTS.MIN_AGE %> years old.</small>
             </div>
             <div class="form-group col-md-6">
               <label for="socialSecurityNumber">Social Security Number <span class="text-danger">*</span></label>
@@ -103,8 +103,8 @@
               <label for="gender">Gender <span class="text-danger">*</span></label>
               <select class="form-control" id="gender" name="gender">
                 <option value="">— Select —</option>
-                <% C.GENDERS.forEach((g, index) => { %>
-                  <option value="<%= index %>"><%= g %></option>
+                <% Object.entries(CONSTANTS.GENDERS).forEach(([key, g]) => { %>
+                  <option value="<%= key %>"><%= g %></option>
                 <% }) %>
               </select>
               <div class="invalid-feedback">Please select a gender.</div>
@@ -112,12 +112,12 @@
             <div class="form-group col-md-8">
               <label for="address">
                 Address <span class="text-danger">*</span>
-                <span class="char-count"><span id="addressCount">0</span>/<%= C.ADDRESS_MAX %></span>
+                <span class="char-count"><span id="addressCount">0</span>/<%= CONSTANTS.ADDRESS_MAX %></span>
               </label>
               <input type="text" class="form-control" id="address" name="address"
                      placeholder="e.g. 123 Main St, Springfield, IL 62701"
-                     maxlength="<%= C.ADDRESS_MAX %>" autocomplete="street-address">
-              <div class="invalid-feedback">Address must be between <%= C.ADDRESS_MIN %> and <%= C.ADDRESS_MAX %> characters.</div>
+                     maxlength="<%= CONSTANTS.ADDRESS_MAX %>" autocomplete="street-address">
+              <div class="invalid-feedback">Address must be between <%= CONSTANTS.ADDRESS_MIN %> and <%= CONSTANTS.ADDRESS_MAX %> characters.</div>
               <small class="form-text">Include street, city, state, and ZIP code.</small>
             </div>
           </div>
@@ -147,8 +147,8 @@
               <label for="preferredCommunication">Preferred Communication <span class="text-danger">*</span></label>
               <select class="form-control" id="preferredCommunication" name="preferredCommunication">
                 <option value="">— Select —</option>
-                <% C.COMMUNICATIONS.forEach((comm, index) => { %>
-                  <option value="<%= index %>"><%= comm %></option>
+                <% Object.entries(CONSTANTS.COMMUNICATIONS).forEach(([key, comm]) => { %>
+                  <option value="<%= key %>"><%= comm %></option>
                 <% }) %>
               </select>
               <div class="invalid-feedback">Please select a preferred communication method.</div>
@@ -157,11 +157,11 @@
             <div class="form-group col-md-6">
               <label for="jobTitle">
                 Job Title <span class="text-danger">*</span>
-                <span class="char-count"><span id="jobTitleCount">0</span>/<%= C.JOBTITLE_MAX %></span>
+                <span class="char-count"><span id="jobTitleCount">0</span>/<%= CONSTANTS.JOBTITLE_MAX %></span>
               </label>
               <input type="text" class="form-control" id="jobTitle" name="jobTitle"
-                     placeholder="e.g. Senior Software Engineer" maxlength="<%= C.JOBTITLE_MAX %>">
-              <div class="invalid-feedback">Job title is required (max <%= C.JOBTITLE_MAX %> characters).</div>
+                     placeholder="e.g. Senior Software Engineer" maxlength="<%= CONSTANTS.JOBTITLE_MAX %>">
+              <div class="invalid-feedback">Job title is required (max <%= CONSTANTS.JOBTITLE_MAX %> characters).</div>
               <small class="form-text">Use the official title from the employment contract.</small>
             </div>
           </div>
@@ -172,8 +172,8 @@
               <label for="department">Department <span class="text-danger">*</span></label>
               <select class="form-control" id="department" name="department">
                 <option value="">— Select —</option>
-                <% C.DEPARTMENTS.forEach((dept, index) => { %>
-                  <option value="<%= index %>"><%= dept %></option>
+                <% Object.entries(CONSTANTS.DEPARTMENTS).forEach(([key, dept]) => { %>
+                  <option value="<%= key %>"><%= dept %></option>
                 <% }) %>
               </select>
               <div class="invalid-feedback">Please select a department.</div>
@@ -248,36 +248,34 @@
     });
 
     $('#employeeTable').on('click', '.edit-btn', function () {
-      const id = $(this).data('id');
-      editingId = id;
+      const e = table.row($(this).closest('tr')).data();
+      if (!e) return;
+      
+      editingId = e.employeeId;
       $('#modalTitle').text('Edit Employee');
 
-      $.get(`/employees/${id}`, function (res) {
-        if (!res.success) return;
-        const e = res.data;
-        $('#employeeForm .form-control').removeClass('is-invalid');
-        $('#employeeId').val(e.employeeId);
-        $('#firstName').val(e.firstName);
-        $('#lastName').val(e.lastName);
-        $('#dateOfBirth').val(e.dateOfBirth ? e.dateOfBirth.split('T')[0] : '');
-        $('#socialSecurityNumber').val(e.socialSecurityNumber);
-        $('#gender').val(e.gender);
-        $('#address').val(e.address);
-        $('#phoneNumber').val(e.phoneNumber);
-        $('#emailAddress').val(e.emailAddress);
-        $('#preferredCommunication').val(e.preferredCommunication);
-        $('#jobTitle').val(e.jobTitle);
-        $('#department').val(e.department);
-        $('#salary').val(e.salary);
-        $('#employeeModal').modal('show');
-      }).fail(function () {
-        Swal.fire('Error', 'Could not load employee data.', 'error');
-      });
+      $('#employeeForm .form-control').removeClass('is-invalid');
+      $('#employeeId').val(e.employeeId);
+      $('#firstName').val(e.firstName);
+      $('#lastName').val(e.lastName);
+      $('#dateOfBirth').val(e.dateOfBirth ? e.dateOfBirth.split('T')[0] : '');
+      $('#socialSecurityNumber').val(e.socialSecurityNumber);
+      $('#gender').val(e.gender);
+      $('#address').val(e.address);
+      $('#phoneNumber').val(e.phoneNumber);
+      $('#emailAddress').val(e.emailAddress);
+      $('#preferredCommunication').val(e.preferredCommunication);
+      $('#jobTitle').val(e.jobTitle);
+      $('#department').val(e.department);
+      $('#salary').val(e.salary);
+      $('#employeeModal').modal('show');
     });
 
     // delete employee confirmation mo
     $('#employeeTable').on('click', '.delete-btn', function () {
-      const id = $(this).data('id');
+      const btn = $(this);
+      const id = btn.data('id');
+      
       Swal.fire({
         title: 'Delete Employee?',
         text: 'This action cannot be undone.',
@@ -291,7 +289,10 @@
         $.ajax({
           url: `/employees/${id}`, method: 'DELETE',
           success(res) {
-            if (res.success) { Swal.fire('Deleted!', res.message, 'success'); table.ajax.reload(); }
+            if (res.success) { 
+              Swal.fire('Deleted!', res.message, 'success'); 
+              table.row(btn.closest('tr')).remove().draw(false); 
+            }
           },
           error(xhr) {
             Swal.fire('Error', xhr.responseJSON?.message || 'Delete failed.', 'error');

@@ -1,14 +1,6 @@
 import { DataTypes, Model } from "@sequelize/core";
 import sequelize from "../config/db.js";
-import {
-    NAME_MIN,
-    NAME_MAX,
-    ADDRESS_MIN,
-    ADDRESS_MAX,
-    JOBTITLE_MAX,
-    REGEX,
-    MIN_AGE,
-} from "../constants/validationConstants.js";
+import CONSTANTS from "../constants/Constants.js";
 
 class Employee extends Model { }
 
@@ -20,21 +12,21 @@ Employee.init(
             primaryKey: true,
         },
         firstName: {
-            type: DataTypes.STRING(NAME_MAX),
+            type: DataTypes.STRING(CONSTANTS.NAME_MAX),
             allowNull: false,
             validate: {
                 notEmpty: true,
-                len: [NAME_MIN, NAME_MAX],
-                is: REGEX.NAME,
+                len: [CONSTANTS.NAME_MIN, CONSTANTS.NAME_MAX],
+                is: CONSTANTS.REGEX.NAME,
             },
         },
         lastName: {
-            type: DataTypes.STRING(NAME_MAX),
+            type: DataTypes.STRING(CONSTANTS.NAME_MAX),
             allowNull: false,
             validate: {
                 notEmpty: true,
-                len: [NAME_MIN, NAME_MAX],
-                is: REGEX.NAME,
+                len: [CONSTANTS.NAME_MIN, CONSTANTS.NAME_MAX],
+                is: CONSTANTS.REGEX.NAME,
             },
         },
         dateOfBirth: {
@@ -51,7 +43,7 @@ Employee.init(
                     let age = today.getFullYear() - dob.getFullYear();
                     const monthDiff = today.getMonth() - dob.getMonth();
                     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) age--;
-                    if (age < MIN_AGE) throw new Error(`Employee must be at least ${MIN_AGE} years old`);
+                    if (age < CONSTANTS.MIN_AGE) throw new Error(`Employee must be at least ${CONSTANTS.MIN_AGE} years old`);
                 },
             },
         },
@@ -61,7 +53,7 @@ Employee.init(
             validate: {
                 notEmpty: true,
                 len: [4, 20],
-                is: REGEX.SSN,
+                is: CONSTANTS.REGEX.SSN,
             },
         },
         // will be mapped in the application
@@ -70,11 +62,11 @@ Employee.init(
             allowNull: false,
         },
         address: {
-            type: DataTypes.STRING(ADDRESS_MAX),
+            type: DataTypes.STRING(CONSTANTS.ADDRESS_MAX),
             allowNull: false,
             validate: {
                 notEmpty: true,
-                len: [ADDRESS_MIN, ADDRESS_MAX],
+                len: [CONSTANTS.ADDRESS_MIN, CONSTANTS.ADDRESS_MAX],
             },
         },
         phoneNumber: {
@@ -83,7 +75,7 @@ Employee.init(
             validate: {
                 notEmpty: true,
                 len: [10, 10],
-                is: REGEX.PHONE,
+                is: CONSTANTS.REGEX.PHONE,
             },
         },
         emailAddress: {
@@ -100,11 +92,11 @@ Employee.init(
             allowNull: false,
         },
         jobTitle: {
-            type: DataTypes.STRING(JOBTITLE_MAX),
+            type: DataTypes.STRING(CONSTANTS.JOBTITLE_MAX),
             allowNull: false,
             validate: {
                 notEmpty: true,
-                len: [1, JOBTITLE_MAX],
+                len: [1, CONSTANTS.JOBTITLE_MAX],
             },
         },
         // will be mapped in the pplication
@@ -118,7 +110,6 @@ Employee.init(
             validate: {
                 notEmpty: true,
                 isDecimal: true,
-                is: REGEX.SALARY,
             },
         },
     },
