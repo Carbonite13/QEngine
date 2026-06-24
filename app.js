@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const sequelize = require("./config/db");
 const employeeRoutes = require("./routes/employeeRoutes");
 const errorHandler = require("./middleware/errorHandler");
+const C = require("./constants/validationConstants");
 
 const app = express();
 
@@ -11,12 +12,15 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+app.get("/js/validationConstants.js", (req, res) => {
+    res.sendFile(path.join(__dirname, "constants/validationConstants.js"));
+});
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 app.get("/", (req, res) => {
-    res.render("employees");
+    res.render("employees", { C });
 });
 
 app.use("/employees", employeeRoutes);

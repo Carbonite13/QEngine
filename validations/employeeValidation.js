@@ -33,7 +33,7 @@ const employeeSchema = Joi.object({
     gender: Joi.string().valid(...GENDERS).required(),
     address: Joi.string().trim().min(ADDRESS_MIN).max(ADDRESS_MAX).required(),
     phoneNumber: Joi.string().pattern(REGEX.PHONE).required(),
-    emailAddress: Joi.string().email().required(),
+    emailAddress: Joi.string().pattern(REGEX.EMAIL).required(),
     preferredCommunication: Joi.string().valid(...COMMUNICATIONS).required(),
     jobTitle: Joi.string().trim().min(1).max(JOBTITLE_MAX).required(),
     department: Joi.string().valid(...DEPARTMENTS).required(),

@@ -48,7 +48,7 @@
   </table>
 </div>
 
-<!-- ════════════════════════════════ MODAL ════════════════════════════════ -->
+<!-- modal -->
 <div class="modal fade" id="employeeModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -66,15 +66,15 @@
             <div class="form-group col-md-6">
               <label for="firstName">First Name <span class="text-danger">*</span></label>
               <input type="text" class="form-control" id="firstName" name="firstName"
-                     placeholder="e.g. John" maxlength="40" autocomplete="given-name">
-              <div class="invalid-feedback">Letters, spaces, hyphens and apostrophes only (1–40 chars).</div>
+                     placeholder="e.g. John" maxlength="<%= C.NAME_MAX %>" autocomplete="given-name">
+              <div class="invalid-feedback">Letters, spaces, hyphens and apostrophes only (<%= C.NAME_MIN %>–<%= C.NAME_MAX %> chars).</div>
               <small class="form-text">Legal first name as it appears on official documents.</small>
             </div>
             <div class="form-group col-md-6">
               <label for="lastName">Last Name <span class="text-danger">*</span></label>
               <input type="text" class="form-control" id="lastName" name="lastName"
-                     placeholder="e.g. Doe" maxlength="40" autocomplete="family-name">
-              <div class="invalid-feedback">Letters, spaces, hyphens and apostrophes only (1–40 chars).</div>
+                     placeholder="e.g. Doe" maxlength="<%= C.NAME_MAX %>" autocomplete="family-name">
+              <div class="invalid-feedback">Letters, spaces, hyphens and apostrophes only (<%= C.NAME_MIN %>–<%= C.NAME_MAX %> chars).</div>
               <small class="form-text">Legal last name — include suffix (Jr., III) if applicable.</small>
             </div>
           </div>
@@ -85,8 +85,8 @@
               <label for="dateOfBirth">Date of Birth <span class="text-danger">*</span></label>
               <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth"
                      autocomplete="bday">
-              <div class="invalid-feedback" id="dobError">Employee must be at least 18 years old.</div>
-              <small class="form-text">Must be in the past and employee must be ≥ 18 years old.</small>
+              <div class="invalid-feedback" id="dobError">Employee must be at least <%= C.MIN_AGE %> years old.</div>
+              <small class="form-text">Must be in the past and employee must be ≥ <%= C.MIN_AGE %> years old.</small>
             </div>
             <div class="form-group col-md-6">
               <label for="socialSecurityNumber">Social Security Number <span class="text-danger">*</span></label>
@@ -103,21 +103,21 @@
               <label for="gender">Gender <span class="text-danger">*</span></label>
               <select class="form-control" id="gender" name="gender">
                 <option value="">— Select —</option>
-                <option>Male</option>
-                <option>Female</option>
-                <option>Other</option>
+                <% C.GENDERS.forEach(g => { %>
+                  <option><%= g %></option>
+                <% }) %>
               </select>
               <div class="invalid-feedback">Please select a gender.</div>
             </div>
             <div class="form-group col-md-8">
               <label for="address">
                 Address <span class="text-danger">*</span>
-                <span class="char-count"><span id="addressCount">0</span>/80</span>
+                <span class="char-count"><span id="addressCount">0</span>/<%= C.ADDRESS_MAX %></span>
               </label>
               <input type="text" class="form-control" id="address" name="address"
                      placeholder="e.g. 123 Main St, Springfield, IL 62701"
-                     maxlength="80" autocomplete="street-address">
-              <div class="invalid-feedback">Address must be between 10 and 80 characters.</div>
+                     maxlength="<%= C.ADDRESS_MAX %>" autocomplete="street-address">
+              <div class="invalid-feedback">Address must be between <%= C.ADDRESS_MIN %> and <%= C.ADDRESS_MAX %> characters.</div>
               <small class="form-text">Include street, city, state, and ZIP code.</small>
             </div>
           </div>
@@ -147,8 +147,9 @@
               <label for="preferredCommunication">Preferred Communication <span class="text-danger">*</span></label>
               <select class="form-control" id="preferredCommunication" name="preferredCommunication">
                 <option value="">— Select —</option>
-                <option>Email</option>
-                <option>Phone</option>
+                <% C.COMMUNICATIONS.forEach(comm => { %>
+                  <option><%= comm %></option>
+                <% }) %>
               </select>
               <div class="invalid-feedback">Please select a preferred communication method.</div>
               <small class="form-text">How should we contact this employee?</small>
@@ -156,11 +157,11 @@
             <div class="form-group col-md-6">
               <label for="jobTitle">
                 Job Title <span class="text-danger">*</span>
-                <span class="char-count"><span id="jobTitleCount">0</span>/60</span>
+                <span class="char-count"><span id="jobTitleCount">0</span>/<%= C.JOBTITLE_MAX %></span>
               </label>
               <input type="text" class="form-control" id="jobTitle" name="jobTitle"
-                     placeholder="e.g. Senior Software Engineer" maxlength="60">
-              <div class="invalid-feedback">Job title is required (max 60 characters).</div>
+                     placeholder="e.g. Senior Software Engineer" maxlength="<%= C.JOBTITLE_MAX %>">
+              <div class="invalid-feedback">Job title is required (max <%= C.JOBTITLE_MAX %> characters).</div>
               <small class="form-text">Use the official title from the employment contract.</small>
             </div>
           </div>
@@ -171,14 +172,9 @@
               <label for="department">Department <span class="text-danger">*</span></label>
               <select class="form-control" id="department" name="department">
                 <option value="">— Select —</option>
-                <option>Sales</option>
-                <option>Marketing</option>
-                <option>Human Resources</option>
-                <option>Finance</option>
-                <option>Engineering</option>
-                <option>Information Technology (IT)</option>
-                <option>Customer Support</option>
-                <option>Design</option>
+                <% C.DEPARTMENTS.forEach(dept => { %>
+                  <option><%= dept %></option>
+                <% }) %>
               </select>
               <div class="invalid-feedback">Please select a department.</div>
             </div>
@@ -209,77 +205,75 @@
     </div>
   </div>
 </div>
-<!-- ═══════════════════════════ END MODAL ═══════════════════════════════ -->
+<!-- end modal -->
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script src="/js/validationConstants.js"></script>
 <script>
-  /* ══════════════════════════════════════════════════════════════════════════
-     Helpers
-  ══════════════════════════════════════════════════════════════════════════ */
+  // constants (loaded from validationConstants.js)
+  const REGEX = C.REGEX;
+  const LIMITS = C;
 
-  // Max DOB = today minus 18 years (min employee age)
+  // helpers
+
+  // Max DOB = today minus MIN_AGE years
   function maxDOB() {
     const d = new Date();
-    d.setFullYear(d.getFullYear() - 18);
+    d.setFullYear(d.getFullYear() - LIMITS.MIN_AGE);
     return d.toISOString().split('T')[0];
   }
 
-  // Min DOB = today minus 120 years (max employee age – not surfaced to user)
+  // Min DOB = today minus MAX_AGE years (not surfaced to user)
   function minDOB() {
     const d = new Date();
-    d.setFullYear(d.getFullYear() - 120);
+    d.setFullYear(d.getFullYear() - LIMITS.MAX_AGE);
     return d.toISOString().split('T')[0];
   }
 
   // SSN auto-mask  000-00-0000
   function formatSSN(raw) {
-    const digits = raw.replace(/\D/g, '').slice(0, 9);
+    const digits = raw.replace(REGEX.STRIP_DIGITS, '').slice(0, 9);
     if (digits.length <= 3)  return digits;
     if (digits.length <= 5)  return digits.slice(0,3) + '-' + digits.slice(3);
     return digits.slice(0,3) + '-' + digits.slice(3,5) + '-' + digits.slice(5);
   }
 
-  // Phone auto-mask  000-000-0000
+  // phone auto-mask  000-000-0000
   function formatPhone(raw) {
-    const digits = raw.replace(/\D/g, '').slice(0, 10);
+    const digits = raw.replace(REGEX.STRIP_DIGITS, '').slice(0, 10);
     if (digits.length <= 3)  return digits;
     if (digits.length <= 6)  return digits.slice(0,3) + '-' + digits.slice(3);
     return digits.slice(0,3) + '-' + digits.slice(3,6) + '-' + digits.slice(6);
   }
 
   // Strip non-digits (send bare digits to API)
-  function digitsOnly(str) { return str.replace(/\D/g, ''); }
+  function digitsOnly(str) { return str.replace(REGEX.STRIP_DIGITS, ''); }
 
-  const NAME_RE   = /^[A-Za-z\s'.\-]+$/;
-  const EMAIL_RE  = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  /* ══════════════════════════════════════════════════════════════════════════
-     Per-field validators   returns "" if OK, else error message
-  ══════════════════════════════════════════════════════════════════════════ */
+  // per-field validators   returns "" if OK, else error message
   const validators = {
-    firstName(v)              { return v && NAME_RE.test(v) && v.length <= 40 ? '' : 'Letters, spaces, hyphens and apostrophes only (1–40 chars).'; },
-    lastName(v)               { return v && NAME_RE.test(v) && v.length <= 40 ? '' : 'Letters, spaces, hyphens and apostrophes only (1–40 chars).'; },
+    firstName(v)              { return v && REGEX.NAME.test(v) && v.length <= LIMITS.NAME_MAX ? '' : `Letters, spaces, hyphens and apostrophes only (1–${LIMITS.NAME_MAX} chars).`; },
+    lastName(v)               { return v && REGEX.NAME.test(v) && v.length <= LIMITS.NAME_MAX ? '' : `Letters, spaces, hyphens and apostrophes only (1–${LIMITS.NAME_MAX} chars).`; },
     dateOfBirth(v)            {
       if (!v) return 'Date of birth is required.';
       const dob = new Date(v);
       const max = new Date(maxDOB());
       const min = new Date(minDOB());
       if (dob > new Date())  return 'Date of birth must be in the past.';
-      if (dob > max)         return 'Employee must be at least 18 years old.';
+      if (dob > max)         return `Employee must be at least ${LIMITS.MIN_AGE} years old.`;
       if (dob < min)         return 'Please enter a valid date of birth.';
       return '';
     },
-    socialSecurityNumber(v)   { return /^\d{3}-\d{2}-\d{4}$/.test(v) ? '' : 'Enter a valid SSN in the format 000-00-0000.'; },
+    socialSecurityNumber(v)   { return REGEX.SSN_DISPLAY.test(v) ? '' : 'Enter a valid SSN in the format 000-00-0000.'; },
     gender(v)                 { return v ? '' : 'Please select a gender.'; },
-    address(v)                { return v && v.length >= 10 && v.length <= 80 ? '' : 'Address must be between 10 and 80 characters.'; },
-    phoneNumber(v)            { return /^\d{3}-\d{3}-\d{4}$/.test(v) ? '' : 'Enter exactly 10 digits.'; },
-    emailAddress(v)           { return EMAIL_RE.test(v) ? '' : 'Enter a valid email address (e.g. user@domain.com).'; },
+    address(v)                { return v && v.length >= LIMITS.ADDRESS_MIN && v.length <= LIMITS.ADDRESS_MAX ? '' : `Address must be between ${LIMITS.ADDRESS_MIN} and ${LIMITS.ADDRESS_MAX} characters.`; },
+    phoneNumber(v)            { return REGEX.PHONE_DISPLAY.test(v) ? '' : 'Enter exactly 10 digits.'; },
+    emailAddress(v)           { return REGEX.EMAIL.test(v) ? '' : 'Enter a valid email address (e.g. user@domain.com).'; },
     preferredCommunication(v) { return v ? '' : 'Please select a preferred communication method.'; },
-    jobTitle(v)               { return v && v.trim().length >= 1 && v.length <= 60 ? '' : 'Job title is required (max 60 characters).'; },
+    jobTitle(v)               { return v && v.trim().length >= 1 && v.length <= LIMITS.JOBTITLE_MAX ? '' : `Job title is required (max ${LIMITS.JOBTITLE_MAX} characters).`; },
     department(v)             { return v ? '' : 'Please select a department.'; },
     salary(v)                 { return v !== '' && !isNaN(v) && parseFloat(v) >= 0 ? '' : 'Enter a valid positive salary.'; }
   };
@@ -316,28 +310,25 @@
     $('#jobTitleCount').text('0');
   }
 
-  /* ══════════════════════════════════════════════════════════════════════════
-     Bootstrap DataTable + CRUD
-  ══════════════════════════════════════════════════════════════════════════ */
+  // data table + CRUD
   let table;
   let editingId = null;
 
   $(document).ready(function () {
 
-    // Set max DOB attribute
+    // set max DOB attribute
     $('#dateOfBirth').attr('max', maxDOB()).attr('min', minDOB());
 
-    // ── SSN masking ────────────────────────────────────────────────────────
+    // ssn masking
     $('#socialSecurityNumber').on('input', function () {
       const pos    = this.selectionStart;
       const before = this.value;
       const masked = formatSSN(this.value);
       this.value   = masked;
-      // Keep caret roughly in place
       if (masked.length > before.length) this.setSelectionRange(pos + 1, pos + 1);
     }).on('blur', function () { validateField('socialSecurityNumber'); });
 
-    // ── Phone masking ──────────────────────────────────────────────────────
+    // phone masking
     $('#phoneNumber').on('input', function () {
       const pos    = this.selectionStart;
       const before = this.value;
@@ -346,14 +337,14 @@
       if (masked.length > before.length) this.setSelectionRange(pos + 1, pos + 1);
     }).on('blur', function () { validateField('phoneNumber'); });
 
-    // ── Live validation on blur / change ──────────────────────────────────
+    // live validation on blur / change
     $('#employeeForm').on('blur', '.form-control', function () {
       validateField(this.id);
     }).on('change', 'select', function () {
       validateField(this.id);
     });
 
-    // ── Char counters ──────────────────────────────────────────────────────
+    // char counters
     $('#address').on('input', function () {
       $('#addressCount').text(this.value.length);
       if (this.value.length > 0) validateField('address');
@@ -363,7 +354,7 @@
       if (this.value.length > 0) validateField('jobTitle');
     });
 
-    // ── DataTable ──────────────────────────────────────────────────────────
+    // data table
     table = $('#employeeTable').DataTable({
       ajax: { url: '/employees', dataSrc: 'data' },
       columns: [
@@ -382,7 +373,7 @@
       order: [[0, 'desc']]
     });
 
-    // ── Open modal – ADD ───────────────────────────────────────────────────
+    // open modal add
     $('#addEmployeeBtn').on('click', function () {
       editingId = null;
       $('#modalTitle').text('Add Employee');
@@ -392,7 +383,7 @@
       $('#employeeModal').modal('show');
     });
 
-    // ── Open modal – EDIT ──────────────────────────────────────────────────
+    // open modal edit
     $('#employeeTable').on('click', '.edit-btn', function () {
       const id = $(this).data('id');
       editingId = id;
@@ -425,7 +416,7 @@
       });
     });
 
-    // ── DELETE ─────────────────────────────────────────────────────────────
+    // delete
     $('#employeeTable').on('click', '.delete-btn', function () {
       const id = $(this).data('id');
       Swal.fire({
@@ -450,7 +441,7 @@
       });
     });
 
-    // ── SAVE (Create / Update) ─────────────────────────────────────────────
+    // create / save
     $('#employeeForm').on('submit', function (ev) {
       ev.preventDefault();
 
