@@ -1,11 +1,9 @@
-const Employee = require("../models/Employee");
+const employeeService = require("../services/employeeService");
 const employeeSchema = require("../validations/employeeValidation");
 
 const getAllEmployees = async (req, res, next) => {
     try {
-        const employees = await Employee.findAll({
-            order: [["employeeId", "DESC"]],
-        });
+        const employees = await employeeService.getAllEmployees();
         res.json({ success: true, data: employees });
     } catch (error) {
         next(error);
@@ -14,7 +12,7 @@ const getAllEmployees = async (req, res, next) => {
 
 const getEmployeeById = async (req, res, next) => {
     try {
-        const employee = await Employee.findByPk(req.params.id);
+        const employee = await employeeService.getEmployeeById(req.params.id);
 
         if (!employee) {
             return res.status(404).json({
@@ -44,7 +42,7 @@ const createEmployee = async (req, res, next) => {
             });
         }
 
-        const employee = await Employee.create(value);
+        const employee = await employeeService.createEmployee(value);
 
         res.status(201).json({
             success: true,
@@ -58,15 +56,6 @@ const createEmployee = async (req, res, next) => {
 
 const updateEmployee = async (req, res, next) => {
     try {
-        const employee = await Employee.findByPk(req.params.id);
-
-        if (!employee) {
-            return res.status(404).json({
-                success: false,
-                message: "Employee not found",
-            });
-        }
-
         const { error, value } = employeeSchema.validate(req.body, {
             abortEarly: false,
             convert: true,
@@ -80,7 +69,14 @@ const updateEmployee = async (req, res, next) => {
             });
         }
 
-        await employee.update(value);
+        const employee = await employeeService.updateEmployee(req.params.id, value);
+
+        if (!employee) {
+            return res.status(404).json({
+                success: false,
+                message: "Employee not found",
+            });
+        }
 
         res.json({
             success: true,
@@ -94,16 +90,14 @@ const updateEmployee = async (req, res, next) => {
 
 const deleteEmployee = async (req, res, next) => {
     try {
-        const employee = await Employee.findByPk(req.params.id);
+        const deleted = await employeeService.deleteEmployee(req.params.id);
 
-        if (!employee) {
+        if (!deleted) {
             return res.status(404).json({
                 success: false,
                 message: "Employee not found",
             });
         }
-
-        await employee.destroy();
 
         res.json({
             success: true,
