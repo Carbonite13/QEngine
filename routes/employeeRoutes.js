@@ -1,11 +1,11 @@
-const express = require("express");
+import express from "express";
+import * as c from "../controllers/employeeController.js";
 const router = express.Router();
-const c = require("../controllers/employeeController");
 
-router.get("/", c.getAllEmployees);
-router.get("/:id", c.getEmployeeById);
-router.post("/", c.createEmployee);
-router.put("/:id", c.updateEmployee);
-router.delete("/:id", c.deleteEmployee);
+router.get("/", c.getAll);
+router.get("/:id", c.get);
+router.post("/", c.create);
+router.put("/:id", c.update);
+router.delete("/:id", c.remove);
 
-module.exports = router;
+export default router;

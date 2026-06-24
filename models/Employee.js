@@ -1,17 +1,14 @@
-const { DataTypes, Model } = require("@sequelize/core");
-const sequelize = require("../config/db");
-const {
+import { DataTypes, Model } from "@sequelize/core";
+import sequelize from "../config/db.js";
+import {
     NAME_MIN,
     NAME_MAX,
     ADDRESS_MIN,
     ADDRESS_MAX,
     JOBTITLE_MAX,
-    GENDERS,
-    COMMUNICATIONS,
-    DEPARTMENTS,
     REGEX,
     MIN_AGE,
-} = require("../constants/validationConstants");
+} from "../constants/validationConstants.js";
 
 class Employee extends Model { }
 
@@ -67,8 +64,9 @@ Employee.init(
                 is: REGEX.SSN,
             },
         },
+        // will be mapped in the application
         gender: {
-            type: DataTypes.ENUM(...GENDERS),
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         address: {
@@ -96,8 +94,9 @@ Employee.init(
                 isEmail: true,
             },
         },
+        // will be mapped in the pplication
         preferredCommunication: {
-            type: DataTypes.ENUM(...COMMUNICATIONS),
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         jobTitle: {
@@ -108,8 +107,9 @@ Employee.init(
                 len: [1, JOBTITLE_MAX],
             },
         },
+        // will be mapped in the pplication
         department: {
-            type: DataTypes.ENUM(...DEPARTMENTS),
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         salary: {
@@ -130,4 +130,4 @@ Employee.init(
     }
 );
 
-module.exports = Employee;
+export default Employee;

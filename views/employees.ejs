@@ -103,8 +103,8 @@
               <label for="gender">Gender <span class="text-danger">*</span></label>
               <select class="form-control" id="gender" name="gender">
                 <option value="">— Select —</option>
-                <% C.GENDERS.forEach(g => { %>
-                  <option><%= g %></option>
+                <% C.GENDERS.forEach((g, index) => { %>
+                  <option value="<%= index %>"><%= g %></option>
                 <% }) %>
               </select>
               <div class="invalid-feedback">Please select a gender.</div>
@@ -147,8 +147,8 @@
               <label for="preferredCommunication">Preferred Communication <span class="text-danger">*</span></label>
               <select class="form-control" id="preferredCommunication" name="preferredCommunication">
                 <option value="">— Select —</option>
-                <% C.COMMUNICATIONS.forEach(comm => { %>
-                  <option><%= comm %></option>
+                <% C.COMMUNICATIONS.forEach((comm, index) => { %>
+                  <option value="<%= index %>"><%= comm %></option>
                 <% }) %>
               </select>
               <div class="invalid-feedback">Please select a preferred communication method.</div>
@@ -172,8 +172,8 @@
               <label for="department">Department <span class="text-danger">*</span></label>
               <select class="form-control" id="department" name="department">
                 <option value="">— Select —</option>
-                <% C.DEPARTMENTS.forEach(dept => { %>
-                  <option><%= dept %></option>
+                <% C.DEPARTMENTS.forEach((dept, index) => { %>
+                  <option value="<%= index %>"><%= dept %></option>
                 <% }) %>
               </select>
               <div class="invalid-feedback">Please select a department.</div>
@@ -212,89 +212,20 @@
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script src="/js/validationConstants.js"></script>
 <script>
-  // constants (loaded from validationConstants.js)
-  const REGEX = C.REGEX;
-  const LIMITS = C;
-
-  // helpers
-
-  // Max DOB = today minus MIN_AGE years
-  function maxDOB() {
-    const d = new Date();
-    d.setFullYear(d.getFullYear() - LIMITS.MIN_AGE);
-    return d.toISOString().split('T')[0];
-  }
-
-  // Min DOB = today minus MAX_AGE years (not surfaced to user)
-  function minDOB() {
-    const d = new Date();
-    d.setFullYear(d.getFullYear() - LIMITS.MAX_AGE);
-    return d.toISOString().split('T')[0];
-  }
-
-  // SSN auto-mask  000-00-0000
-  function formatSSN(raw) {
-    const digits = raw.replace(REGEX.STRIP_DIGITS, '').slice(0, 9);
-    if (digits.length <= 3)  return digits;
-    if (digits.length <= 5)  return digits.slice(0,3) + '-' + digits.slice(3);
-    return digits.slice(0,3) + '-' + digits.slice(3,5) + '-' + digits.slice(5);
-  }
-
-  // phone auto-mask  000-000-0000
-  function formatPhone(raw) {
-    const digits = raw.replace(REGEX.STRIP_DIGITS, '').slice(0, 10);
-    if (digits.length <= 3)  return digits;
-    if (digits.length <= 6)  return digits.slice(0,3) + '-' + digits.slice(3);
-    return digits.slice(0,3) + '-' + digits.slice(3,6) + '-' + digits.slice(6);
-  }
-
-  // Strip non-digits (send bare digits to API)
-  function digitsOnly(str) { return str.replace(REGEX.STRIP_DIGITS, ''); }
-
-  // data table + CRUD
   let table;
   let editingId = null;
 
+  function digitsOnly(str) { return str.replace(/\D/g, ''); }
+
   $(document).ready(function () {
 
-    // set max DOB attribute
-    $('#dateOfBirth').attr('max', maxDOB()).attr('min', minDOB());
-
-    // ssn masking
-    $('#socialSecurityNumber').on('input', function () {
-      const pos    = this.selectionStart;
-      const before = this.value;
-      const masked = formatSSN(this.value);
-      this.value   = masked;
-      if (masked.length > before.length) this.setSelectionRange(pos + 1, pos + 1);
-    });
-
-    // phone masking
-    $('#phoneNumber').on('input', function () {
-      const pos    = this.selectionStart;
-      const before = this.value;
-      const masked = formatPhone(this.value);
-      this.value   = masked;
-      if (masked.length > before.length) this.setSelectionRange(pos + 1, pos + 1);
-    });
-
-    // char counters
-    $('#address').on('input', function () {
-      $('#addressCount').text(this.value.length);
-    });
-    $('#jobTitle').on('input', function () {
-      $('#jobTitleCount').text(this.value.length);
-    });
-
-    // data table
     table = $('#employeeTable').DataTable({
       ajax: { url: '/employees', dataSrc: 'data' },
       columns: [
         { data: 'employeeId' },
         { data: null, render: d => `${d.firstName} ${d.lastName}` },
-        { data: 'department' },
+        { data: 'departmentName' },
         { data: 'jobTitle' },
         { data: 'salary',     render: v => '$' + parseFloat(v).toLocaleString('en-US', { minimumFractionDigits: 2 }) },
         {
@@ -307,19 +238,15 @@
       order: [[0, 'desc']]
     });
 
-    // open modal add
     $('#addEmployeeBtn').on('click', function () {
       editingId = null;
       $('#modalTitle').text('Add Employee');
       $('#employeeForm')[0].reset();
       $('#employeeId').val('');
-      $('#employeeForm .form-control').removeClass('is-valid is-invalid');
-      $('#addressCount').text('0');
-      $('#jobTitleCount').text('0');
+      $('#employeeForm .form-control').removeClass('is-invalid');
       $('#employeeModal').modal('show');
     });
 
-    // open modal edit
     $('#employeeTable').on('click', '.edit-btn', function () {
       const id = $(this).data('id');
       editingId = id;
@@ -328,24 +255,18 @@
       $.get(`/employees/${id}`, function (res) {
         if (!res.success) return;
         const e = res.data;
-        $('#employeeForm .form-control').removeClass('is-valid is-invalid');
-        $('#addressCount').text('0');
-        $('#jobTitleCount').text('0');
+        $('#employeeForm .form-control').removeClass('is-invalid');
         $('#employeeId').val(e.employeeId);
         $('#firstName').val(e.firstName);
         $('#lastName').val(e.lastName);
-        $('#dateOfBirth').val(e.dateOfBirth);
-        // Display SSN with dashes
-        $('#socialSecurityNumber').val(formatSSN(e.socialSecurityNumber));
+        $('#dateOfBirth').val(e.dateOfBirth ? e.dateOfBirth.split('T')[0] : '');
+        $('#socialSecurityNumber').val(e.socialSecurityNumber);
         $('#gender').val(e.gender);
         $('#address').val(e.address);
-        $('#addressCount').text((e.address || '').length);
-        // Display phone with dashes
-        $('#phoneNumber').val(formatPhone(e.phoneNumber));
+        $('#phoneNumber').val(e.phoneNumber);
         $('#emailAddress').val(e.emailAddress);
         $('#preferredCommunication').val(e.preferredCommunication);
         $('#jobTitle').val(e.jobTitle);
-        $('#jobTitleCount').text((e.jobTitle || '').length);
         $('#department').val(e.department);
         $('#salary').val(e.salary);
         $('#employeeModal').modal('show');
@@ -354,7 +275,7 @@
       });
     });
 
-    // delete
+    // delete employee confirmation mo
     $('#employeeTable').on('click', '.delete-btn', function () {
       const id = $(this).data('id');
       Swal.fire({
@@ -379,7 +300,6 @@
       });
     });
 
-    // create / save
     $('#employeeForm').on('submit', function (ev) {
       ev.preventDefault();
 
@@ -387,11 +307,10 @@
         firstName:              $('#firstName').val().trim(),
         lastName:               $('#lastName').val().trim(),
         dateOfBirth:            $('#dateOfBirth').val(),
-        // Send bare digits to backend (backend regex: /^[0-9A-Za-z-]{4,20}$/ allows dashes)
         socialSecurityNumber:   $('#socialSecurityNumber').val().trim(),
         gender:                 $('#gender').val(),
         address:                $('#address').val().trim(),
-        phoneNumber:            digitsOnly($('#phoneNumber').val()),   // 10 digits
+        phoneNumber:            digitsOnly($('#phoneNumber').val()),   
         emailAddress:           $('#emailAddress').val().trim(),
         preferredCommunication: $('#preferredCommunication').val(),
         jobTitle:               $('#jobTitle').val().trim(),
@@ -427,11 +346,8 @@
       });
     });
 
-    // Clear validation states when modal is closed
     $('#employeeModal').on('hidden.bs.modal', function() {
-      $('#employeeForm .form-control').removeClass('is-valid is-invalid');
-      $('#addressCount').text('0');
-      $('#jobTitleCount').text('0');
+      $('#employeeForm .form-control').removeClass('is-invalid');
     });
   });
 </script>

@@ -1,6 +1,6 @@
-const { ValidationError } = require("@sequelize/core");
+import { ValidationError } from "@sequelize/core";
 
-module.exports = (err, req, res, next) => {
+export default (err, req, res, next) => {
     if (err instanceof ValidationError) {
         return res.status(400).json({
             success: false,

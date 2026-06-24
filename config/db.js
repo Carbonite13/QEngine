@@ -1,7 +1,9 @@
-const { Sequelize } = require("@sequelize/core");
-const { MySqlDialect } = require("@sequelize/mysql");
+import { Sequelize } from "@sequelize/core";
+import { MySqlDialect } from "@sequelize/mysql";
 
-require('dotenv').config({ path: '.env.local', override: true });
+import dotenv from "dotenv";
+
+dotenv.config({ path: '.env.local', override: true });
 
 const sequelize = new Sequelize({
     dialect: MySqlDialect,
@@ -13,4 +15,4 @@ const sequelize = new Sequelize({
     logging: false,
 });
 
-module.exports = sequelize;
+export default sequelize;

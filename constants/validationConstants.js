@@ -1,4 +1,4 @@
-const C = {
+export const C = {
     NAME_MIN: 1,
     NAME_MAX: 40,
     ADDRESS_MIN: 10,
@@ -32,8 +32,5 @@ const C = {
     },
 };
 
-if (typeof module !== "undefined" && module.exports) {
-    module.exports = C;
-} else if (typeof window !== "undefined") {
-    window.C = C;
-}
+export const { NAME_MIN, NAME_MAX, ADDRESS_MIN, ADDRESS_MAX, JOBTITLE_MAX, MIN_AGE, MAX_AGE, GENDERS, COMMUNICATIONS, DEPARTMENTS, REGEX } = C;
+export default C;

@@ -1,6 +1,6 @@
-const employeeService = require("../services/employeeService");
-const Joi = require("joi");
-const {
+import employeeService from "../services/employeeService.js";
+import Joi from "joi";
+import {
     NAME_MIN,
     NAME_MAX,
     ADDRESS_MIN,
@@ -11,7 +11,8 @@ const {
     DEPARTMENTS,
     REGEX,
     MIN_AGE,
-} = require("../constants/validationConstants");
+} from "../constants/validationConstants.js";
+import C from "../constants/validationConstants.js";
 
 const calcAge = (dob) => {
     const birth = new Date(dob);
@@ -31,31 +32,40 @@ const employeeSchema = Joi.object({
         return value;
     }),
     socialSecurityNumber: Joi.string().trim().pattern(REGEX.SSN).required(),
-    gender: Joi.string().valid(...GENDERS).required(),
+    gender: Joi.number().integer().min(0).max(GENDERS.length - 1).required(),
     address: Joi.string().trim().min(ADDRESS_MIN).max(ADDRESS_MAX).required(),
     phoneNumber: Joi.string().pattern(REGEX.PHONE).required(),
     emailAddress: Joi.string().pattern(REGEX.EMAIL).required(),
-    preferredCommunication: Joi.string().valid(...COMMUNICATIONS).required(),
+    preferredCommunication: Joi.number().integer().min(0).max(COMMUNICATIONS.length - 1).required(),
     jobTitle: Joi.string().trim().min(1).max(JOBTITLE_MAX).required(),
-    department: Joi.string().valid(...DEPARTMENTS).required(),
+    department: Joi.number().integer().min(0).max(DEPARTMENTS.length - 1).required(),
     salary: Joi.number().positive().precision(2).required(),
 });
 
-const renderEmployeesPage = (req, res) => {
-    const C = require("../constants/validationConstants");
+function renderPage(req, res) {
     res.render("employees", { C });
 };
 
-const getAllEmployees = async (req, res, next) => {
+function mapEmployee(e) {
+    const json = e.toJSON ? e.toJSON() : e;
+    return {
+        ...json,
+        genderName: C.GENDERS[json.gender] || "Unknown",
+        departmentName: C.DEPARTMENTS[json.department] || "Unknown",
+        preferredCommunicationName: C.COMMUNICATIONS[json.preferredCommunication] || "Unknown"
+    };
+};
+
+async function getAll(req, res, next) {
     try {
         const employees = await employeeService.getAllEmployees();
-        res.json({ success: true, data: employees });
+        res.json({ success: true, data: employees.map(mapEmployee) });
     } catch (error) {
         next(error);
     }
 };
 
-const getEmployeeById = async (req, res, next) => {
+async function get(req, res, next) {
     try {
         const employee = await employeeService.getEmployeeById(req.params.id);
 
@@ -66,13 +76,13 @@ const getEmployeeById = async (req, res, next) => {
             });
         }
 
-        res.json({ success: true, data: employee });
+        res.json({ success: true, data: mapEmployee(employee) });
     } catch (error) {
         next(error);
     }
 };
 
-const createEmployee = async (req, res, next) => {
+async function create(req, res, next) {
     try {
         const { error, value } = employeeSchema.validate(req.body, {
             abortEarly: false,
@@ -92,14 +102,14 @@ const createEmployee = async (req, res, next) => {
         res.status(201).json({
             success: true,
             message: "Employee created successfully",
-            data: employee,
+            data: mapEmployee(employee),
         });
     } catch (error) {
         next(error);
     }
 };
 
-const updateEmployee = async (req, res, next) => {
+async function update(req, res, next) {
     try {
         const { error, value } = employeeSchema.validate(req.body, {
             abortEarly: false,
@@ -126,14 +136,14 @@ const updateEmployee = async (req, res, next) => {
         res.json({
             success: true,
             message: "Employee updated successfully",
-            data: employee,
+            data: mapEmployee(employee),
         });
     } catch (error) {
         next(error);
     }
 };
 
-const deleteEmployee = async (req, res, next) => {
+async function remove(req, res, next) {
     try {
         const deleted = await employeeService.deleteEmployee(req.params.id);
 
@@ -153,11 +163,11 @@ const deleteEmployee = async (req, res, next) => {
     }
 };
 
-module.exports = {
-    renderEmployeesPage,
-    getAllEmployees,
-    getEmployeeById,
-    createEmployee,
-    updateEmployee,
-    deleteEmployee,
+export {
+    renderPage,
+    getAll,
+    get,
+    create,
+    update,
+    remove,
 };

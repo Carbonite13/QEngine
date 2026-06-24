@@ -1,4 +1,4 @@
-const Employee = require("../models/Employee");
+import Employee from "../models/Employee.js";
 
 class EmployeeService {
     async getAllEmployees() {
@@ -33,4 +33,4 @@ class EmployeeService {
     }
 }
 
-module.exports = new EmployeeService();
+export default new EmployeeService();
