@@ -66,14 +66,14 @@
             <div class="form-group col-md-6">
               <label for="firstName">First Name <span class="text-danger">*</span></label>
               <input type="text" class="form-control" id="firstName" name="firstName"
-                     placeholder="e.g. John" maxlength="<%= CONSTANTS.NAME_MAX %>" autocomplete="given-name">
+                     placeholder="e.g. John" minlength="<%= CONSTANTS.NAME_MIN %>" maxlength="<%= CONSTANTS.NAME_MAX %>" autocomplete="given-name" required>
               <div class="invalid-feedback">Letters, spaces, hyphens and apostrophes only (<%= CONSTANTS.NAME_MIN %>–<%= CONSTANTS.NAME_MAX %> chars).</div>
               <small class="form-text">Legal first name as it appears on official documents.</small>
             </div>
             <div class="form-group col-md-6">
               <label for="lastName">Last Name <span class="text-danger">*</span></label>
               <input type="text" class="form-control" id="lastName" name="lastName"
-                     placeholder="e.g. Doe" maxlength="<%= CONSTANTS.NAME_MAX %>" autocomplete="family-name">
+                     placeholder="e.g. Doe" minlength="<%= CONSTANTS.NAME_MIN %>" maxlength="<%= CONSTANTS.NAME_MAX %>" autocomplete="family-name" required>
               <div class="invalid-feedback">Letters, spaces, hyphens and apostrophes only (<%= CONSTANTS.NAME_MIN %>–<%= CONSTANTS.NAME_MAX %> chars).</div>
               <small class="form-text">Legal last name — include suffix (Jr., III) if applicable.</small>
             </div>
@@ -83,16 +83,21 @@
           <div class="form-row">
             <div class="form-group col-md-6">
               <label for="dateOfBirth">Date of Birth <span class="text-danger">*</span></label>
+              <% 
+                const maxD = new Date();
+                maxD.setFullYear(maxD.getFullYear() - CONSTANTS.MIN_AGE);
+                const maxDob = maxD.toISOString().split('T')[0];
+              %>
               <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth"
-                     autocomplete="bday">
+                     autocomplete="bday" max="<%= maxDob %>" required>
               <div class="invalid-feedback" id="dobError">Employee must be at least <%= CONSTANTS.MIN_AGE %> years old.</div>
               <small class="form-text">Must be in the past and employee must be ≥ <%= CONSTANTS.MIN_AGE %> years old.</small>
             </div>
             <div class="form-group col-md-6">
               <label for="socialSecurityNumber">Social Security Number <span class="text-danger">*</span></label>
               <input type="text" class="form-control" id="socialSecurityNumber" name="socialSecurityNumber"
-                     placeholder="000-00-0000" maxlength="11" inputmode="numeric" autocomplete="off">
-              <div class="invalid-feedback">Enter a valid SSN in the format 000-00-0000.</div>
+                     placeholder="000-00-0000" minlength="4" maxlength="20" inputmode="numeric" autocomplete="off" required>
+              <div class="invalid-feedback">Enter a valid SSN.</div>
               <small class="form-text">Dashes are added automatically as you type.</small>
             </div>
           </div>
@@ -101,7 +106,7 @@
           <div class="form-row">
             <div class="form-group col-md-4">
               <label for="gender">Gender <span class="text-danger">*</span></label>
-              <select class="form-control" id="gender" name="gender">
+              <select class="form-control" id="gender" name="gender" required>
                 <option value="">— Select —</option>
                 <% Object.entries(CONSTANTS.GENDERS).forEach(([key, g]) => { %>
                   <option value="<%= key %>"><%= g %></option>
@@ -116,7 +121,7 @@
               </label>
               <input type="text" class="form-control" id="address" name="address"
                      placeholder="e.g. 123 Main St, Springfield, IL 62701"
-                     maxlength="<%= CONSTANTS.ADDRESS_MAX %>" autocomplete="street-address">
+                     minlength="<%= CONSTANTS.ADDRESS_MIN %>" maxlength="<%= CONSTANTS.ADDRESS_MAX %>" autocomplete="street-address" required>
               <div class="invalid-feedback">Address must be between <%= CONSTANTS.ADDRESS_MIN %> and <%= CONSTANTS.ADDRESS_MAX %> characters.</div>
               <small class="form-text">Include street, city, state, and ZIP code.</small>
             </div>
@@ -127,15 +132,15 @@
             <div class="form-group col-md-6">
               <label for="phoneNumber">Phone Number <span class="text-danger">*</span></label>
               <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
-                     placeholder="e.g. 555-867-5309" maxlength="12" inputmode="numeric"
-                     autocomplete="tel">
-              <div class="invalid-feedback">Enter exactly 10 digits (dashes added automatically).</div>
+                     placeholder="e.g. 555-867-5309" minlength="10" maxlength="12" inputmode="numeric"
+                     autocomplete="tel" required>
+              <div class="invalid-feedback">Enter exactly 10 digits (dashes allowed).</div>
               <small class="form-text">10-digit US number; dashes added automatically.</small>
             </div>
             <div class="form-group col-md-6">
               <label for="emailAddress">Email Address <span class="text-danger">*</span></label>
               <input type="email" class="form-control" id="emailAddress" name="emailAddress"
-                     placeholder="e.g. john.doe@company.com" autocomplete="email">
+                     placeholder="e.g. john.doe@company.com" autocomplete="email" required>
               <div class="invalid-feedback">Enter a valid email address (e.g. user@domain.com).</div>
               <small class="form-text">Work email preferred.</small>
             </div>
@@ -145,7 +150,7 @@
           <div class="form-row">
             <div class="form-group col-md-6">
               <label for="preferredCommunication">Preferred Communication <span class="text-danger">*</span></label>
-              <select class="form-control" id="preferredCommunication" name="preferredCommunication">
+              <select class="form-control" id="preferredCommunication" name="preferredCommunication" required>
                 <option value="">— Select —</option>
                 <% Object.entries(CONSTANTS.COMMUNICATIONS).forEach(([key, comm]) => { %>
                   <option value="<%= key %>"><%= comm %></option>
@@ -160,7 +165,7 @@
                 <span class="char-count"><span id="jobTitleCount">0</span>/<%= CONSTANTS.JOBTITLE_MAX %></span>
               </label>
               <input type="text" class="form-control" id="jobTitle" name="jobTitle"
-                     placeholder="e.g. Senior Software Engineer" maxlength="<%= CONSTANTS.JOBTITLE_MAX %>">
+                     placeholder="e.g. Senior Software Engineer" maxlength="<%= CONSTANTS.JOBTITLE_MAX %>" required>
               <div class="invalid-feedback">Job title is required (max <%= CONSTANTS.JOBTITLE_MAX %> characters).</div>
               <small class="form-text">Use the official title from the employment contract.</small>
             </div>
@@ -170,7 +175,7 @@
           <div class="form-row">
             <div class="form-group col-md-6">
               <label for="department">Department <span class="text-danger">*</span></label>
-              <select class="form-control" id="department" name="department">
+              <select class="form-control" id="department" name="department" required>
                 <option value="">— Select —</option>
                 <% Object.entries(CONSTANTS.DEPARTMENTS).forEach(([key, dept]) => { %>
                   <option value="<%= key %>"><%= dept %></option>
@@ -185,7 +190,7 @@
                   <span class="input-group-text">$</span>
                 </div>
                 <input type="number" class="form-control" id="salary" name="salary"
-                       placeholder="e.g. 75000" min="0" step="0.01">
+                       placeholder="e.g. 75000" min="0" step="0.01" required>
                 <div class="invalid-feedback">Enter a valid positive salary (e.g. 75000.00).</div>
               </div>
               <small class="form-text mt-1">Gross annual compensation before tax.</small>
