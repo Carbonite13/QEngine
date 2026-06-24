@@ -19,9 +19,9 @@ app.get("/js/validationConstants.js", (req, res) => {
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-app.get("/", (req, res) => {
-    res.render("employees", { C });
-});
+const employeeController = require("./controllers/employeeController");
+
+app.get("/", employeeController.renderEmployeesPage);
 
 app.use("/employees", employeeRoutes);
 

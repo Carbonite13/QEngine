@@ -253,63 +253,6 @@
   // Strip non-digits (send bare digits to API)
   function digitsOnly(str) { return str.replace(REGEX.STRIP_DIGITS, ''); }
 
-  // per-field validators   returns "" if OK, else error message
-  const validators = {
-    firstName(v)              { return v && REGEX.NAME.test(v) && v.length <= LIMITS.NAME_MAX ? '' : `Letters, spaces, hyphens and apostrophes only (1–${LIMITS.NAME_MAX} chars).`; },
-    lastName(v)               { return v && REGEX.NAME.test(v) && v.length <= LIMITS.NAME_MAX ? '' : `Letters, spaces, hyphens and apostrophes only (1–${LIMITS.NAME_MAX} chars).`; },
-    dateOfBirth(v)            {
-      if (!v) return 'Date of birth is required.';
-      const dob = new Date(v);
-      const max = new Date(maxDOB());
-      const min = new Date(minDOB());
-      if (dob > new Date())  return 'Date of birth must be in the past.';
-      if (dob > max)         return `Employee must be at least ${LIMITS.MIN_AGE} years old.`;
-      if (dob < min)         return 'Please enter a valid date of birth.';
-      return '';
-    },
-    socialSecurityNumber(v)   { return REGEX.SSN_DISPLAY.test(v) ? '' : 'Enter a valid SSN in the format 000-00-0000.'; },
-    gender(v)                 { return v ? '' : 'Please select a gender.'; },
-    address(v)                { return v && v.length >= LIMITS.ADDRESS_MIN && v.length <= LIMITS.ADDRESS_MAX ? '' : `Address must be between ${LIMITS.ADDRESS_MIN} and ${LIMITS.ADDRESS_MAX} characters.`; },
-    phoneNumber(v)            { return REGEX.PHONE_DISPLAY.test(v) ? '' : 'Enter exactly 10 digits.'; },
-    emailAddress(v)           { return REGEX.EMAIL.test(v) ? '' : 'Enter a valid email address (e.g. user@domain.com).'; },
-    preferredCommunication(v) { return v ? '' : 'Please select a preferred communication method.'; },
-    jobTitle(v)               { return v && v.trim().length >= 1 && v.length <= LIMITS.JOBTITLE_MAX ? '' : `Job title is required (max ${LIMITS.JOBTITLE_MAX} characters).`; },
-    department(v)             { return v ? '' : 'Please select a department.'; },
-    salary(v)                 { return v !== '' && !isNaN(v) && parseFloat(v) >= 0 ? '' : 'Enter a valid positive salary.'; }
-  };
-
-  function validateField(id) {
-    const $el  = $('#' + id);
-    const val  = $el.val() ? $el.val().trim() : '';
-    const msg  = validators[id] ? validators[id](val) : '';
-    const $err = $el.next('.invalid-feedback').length
-                   ? $el.next('.invalid-feedback')
-                   : $el.closest('.input-group').next('.invalid-feedback');
-
-    if (msg) {
-      $el.addClass('is-invalid').removeClass('is-valid');
-      if ($err.length && msg !== $err.text()) $err.text(msg);
-      return false;
-    }
-    $el.removeClass('is-invalid').addClass('is-valid');
-    return true;
-  }
-
-  function validateAll() {
-    const fields = ['firstName','lastName','dateOfBirth','socialSecurityNumber',
-                    'gender','address','phoneNumber','emailAddress',
-                    'preferredCommunication','jobTitle','department','salary'];
-    let ok = true;
-    fields.forEach(id => { if (!validateField(id)) ok = false; });
-    return ok;
-  }
-
-  function clearValidation() {
-    $('#employeeForm .form-control').removeClass('is-valid is-invalid');
-    $('#addressCount').text('0');
-    $('#jobTitleCount').text('0');
-  }
-
   // data table + CRUD
   let table;
   let editingId = null;
@@ -326,7 +269,7 @@
       const masked = formatSSN(this.value);
       this.value   = masked;
       if (masked.length > before.length) this.setSelectionRange(pos + 1, pos + 1);
-    }).on('blur', function () { validateField('socialSecurityNumber'); });
+    });
 
     // phone masking
     $('#phoneNumber').on('input', function () {
@@ -335,23 +278,14 @@
       const masked = formatPhone(this.value);
       this.value   = masked;
       if (masked.length > before.length) this.setSelectionRange(pos + 1, pos + 1);
-    }).on('blur', function () { validateField('phoneNumber'); });
-
-    // live validation on blur / change
-    $('#employeeForm').on('blur', '.form-control', function () {
-      validateField(this.id);
-    }).on('change', 'select', function () {
-      validateField(this.id);
     });
 
     // char counters
     $('#address').on('input', function () {
       $('#addressCount').text(this.value.length);
-      if (this.value.length > 0) validateField('address');
     });
     $('#jobTitle').on('input', function () {
       $('#jobTitleCount').text(this.value.length);
-      if (this.value.length > 0) validateField('jobTitle');
     });
 
     // data table
@@ -379,7 +313,9 @@
       $('#modalTitle').text('Add Employee');
       $('#employeeForm')[0].reset();
       $('#employeeId').val('');
-      clearValidation();
+      $('#employeeForm .form-control').removeClass('is-valid is-invalid');
+      $('#addressCount').text('0');
+      $('#jobTitleCount').text('0');
       $('#employeeModal').modal('show');
     });
 
@@ -392,7 +328,9 @@
       $.get(`/employees/${id}`, function (res) {
         if (!res.success) return;
         const e = res.data;
-        clearValidation();
+        $('#employeeForm .form-control').removeClass('is-valid is-invalid');
+        $('#addressCount').text('0');
+        $('#jobTitleCount').text('0');
         $('#employeeId').val(e.employeeId);
         $('#firstName').val(e.firstName);
         $('#lastName').val(e.lastName);
@@ -445,13 +383,6 @@
     $('#employeeForm').on('submit', function (ev) {
       ev.preventDefault();
 
-      if (!validateAll()) {
-        // Scroll to first invalid field
-        const $first = $('#employeeForm .is-invalid').first();
-        if ($first.length) $first[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
-      }
-
       const formData = {
         firstName:              $('#firstName').val().trim(),
         lastName:               $('#lastName').val().trim(),
@@ -497,7 +428,11 @@
     });
 
     // Clear validation states when modal is closed
-    $('#employeeModal').on('hidden.bs.modal', clearValidation);
+    $('#employeeModal').on('hidden.bs.modal', function() {
+      $('#employeeForm .form-control').removeClass('is-valid is-invalid');
+      $('#addressCount').text('0');
+      $('#jobTitleCount').text('0');
+    });
   });
 </script>
 </body>
